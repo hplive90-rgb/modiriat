@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>مدیریت کالا، مشتری و فروش</title>
+
+<!-- PWA Meta -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مدیریت فروش">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="مدیریت فروش">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f766e'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle'%3E%F0%9F%8F%AA%3C/text%3E%3C/svg%3E">
+
+<style>
+:root{--bg:#f4f7f8;--card:#fff;--ink:#17212b;--muted:#667085;--brand:#0f766e;--line:#e4e9ed;--danger:#b42318}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px Tahoma,Arial,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+header{background:var(--brand);color:white;padding:17px 15px calc(17px + env(safe-area-inset-top));position:sticky;top:0;z-index:3}
+header h1{font-size:18px;margin:0 0 5px}
+header p{margin:0;color:#d8f3ee;font-size:12px}
+header .ver{color:#a7e5db;font-size:11px;margin-top:4px}
+main{max-width:720px;margin:auto;padding:12px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab{flex:1;border:1px solid var(--line);background:#fff;border-radius:11px;padding:11px 4px;font-weight:bold;color:var(--ink);cursor:pointer;font-family:inherit;transition:background .15s}
+.tab:active{opacity:.75}
+.tab.active{background:#dff4ef;border-color:#8acfc2;color:#075e56}
+.panel{display:none}.panel.active{display:block}
+.card{background:white;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:11px}
+h2{font-size:15px;margin:0 0 12px}
+label{display:block;color:var(--muted);font-size:12px;margin:0 0 5px}
+input,select{width:100%;min-width:0;padding:11px;border:1px solid #cfd8df;border-radius:10px;background:white;font:inherit;color:inherit}
+input:focus,select:focus{outline:2px solid #99d8cd}
+form{display:grid;gap:10px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.primary{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px;font-weight:bold;font-family:inherit;cursor:pointer}
+.primary:active{opacity:.85}
+.secondary{background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:inherit;cursor:pointer;color:inherit}
+.danger{color:var(--danger);border-color:#efc2bf}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:11px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 4px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+.stat strong{font-size:13px;overflow-wrap:anywhere}
+.item{border-top:1px solid var(--line);padding:11px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.item:first-child{border-top:0}
+.name{font-weight:bold;margin-bottom:4px}
+.sub{font-size:12px;color:var(--muted);line-height:1.7}
+.actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.total{color:var(--brand);font-weight:bold}
+.empty{text-align:center;color:var(--muted);padding:16px}
+.notice{font-size:11px;color:var(--muted);line-height:1.8}
+.line-row{display:grid;grid-template-columns:minmax(0,1fr) 74px 90px 32px;gap:5px;align-items:end;margin:8px 0}
+.line-row label{font-size:11px}
+.line-row input,.line-row select{padding:9px;font-size:12px}
+.remove-line{height:38px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--danger);cursor:pointer;font-size:16px;font-family:inherit}
+
+/* جستجوی محصول داخل فاکتور */
+.line-search{position:relative}
+.line-search input{width:100%}
+.line-results{position:absolute;top:100%;left:0;right:0;background:white;border:1px solid #cfd8df;border-radius:9px;margin-top:3px;max-height:220px;overflow-y:auto;z-index:50;box-shadow:0 6px 18px #0002;display:none}
+.line-results.show{display:block}
+.line-result{padding:9px 11px;cursor:pointer;border-bottom:1px solid #f1f5f9;font-size:12px}
+.line-result:last-child{border-bottom:0}
+.line-result:hover{background:#edf3ff}
+.line-result b{display:block}
+.line-result small{color:var(--muted);font-size:11px}
+
+/* جستجو در فهرست‌ها */
+.search-box{position:relative;margin-bottom:10px}
+.search-box input{padding-right:34px}
+.search-box::before{content:"🔎";position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;opacity:.6}
+.list-scroll{max-height:520px;overflow-y:auto;margin:0 -13px;padding:0 13px}
+.list-scroll::-webkit-scrollbar{width:6px}
+.list-scroll::-webkit-scrollbar-thumb{background:#cfd8df;border-radius:3px}
+
+/* بنر نصب */
+.install-banner{position:fixed;bottom:0;left:0;right:0;background:white;padding:12px;box-shadow:0 -4px 15px #0002;display:none;z-index:998;border-radius:14px 14px 0 0;max-width:720px;margin:0 auto}
+.install-banner.show{display:block;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.install-banner-content{display:flex;gap:10px;align-items:center}
+.install-banner-icon{width:48px;height:48px;border-radius:11px;flex-shrink:0;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:26px}
+.install-banner-text{flex:1;min-width:0}
+.install-banner-text strong{display:block;font-size:14px;margin-bottom:2px}
+.install-banner-text small{color:var(--muted);font-size:12px;line-height:1.4}
+.install-banner .actions{margin-top:10px;flex-wrap:nowrap}
+.install-banner .actions button{font-size:13px;padding:9px;flex:1}
+
+.pwa-status{font-size:11px;padding:4px 8px;border-radius:6px;background:#d1fae5;color:#065f46;display:inline-block}
+.pwa-status.warn{background:#fef3c7;color:#92400e}
+.pwa-status.err{background:#fee2e2;color:#991b1b}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#17212b;color:white;padding:11px 18px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;max-width:90%}
+.toast.show{opacity:1}
+
+@media(max-width:380px){
+  .fields{grid-template-columns:1fr}
+  .line-row{grid-template-columns:minmax(0,1fr) 58px 76px 28px;gap:3px}
+  .line-row input,.line-row select{padding:8px 5px}
+  .tab{font-size:12px}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>🏪 مدیریت کالا، مشتری و فروش</h1>
+<p>هر فاکتور می‌تواند چند محصول برای یک مشتری داشته باشد</p>
+<p class="ver" id="versionLabel">نسخه ۱.۰</p>
+</header>
+<main>
+<div class="stats">
+  <div class="stat"><small>تعداد کالا</small><strong id="prodCount">۰</strong></div>
+  <div class="stat"><small>ارزش موجودی</small><strong id="stockWorth">۰</strong></div>
+  <div class="stat"><small>کل فروش</small><strong id="salesWorth">۰</strong></div>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="products">📦 کالاها</button>
+  <button class="tab" data-tab="sell">🧾 فروش جدید</button>
+  <button class="tab" data-tab="history">👥 فروش‌ها</button>
+  <button class="tab" data-tab="backup">📊 اکسل</button>
+</nav>
+
+<!-- کالاها -->
+<section id="products" class="panel active">
+<div class="card">
+  <h2 id="pTitle">ثبت کالا</h2>
+  <form id="pForm">
+    <input type="hidden" id="pEdit">
+    <div><label>نام محصول</label><input id="pName" required placeholder="مثلاً محصول الف"></div>
+    <div class="fields">
+      <div><label>قیمت پایه</label><input id="pPrice" type="number" min="0" step="any" inputmode="decimal" required></div>
+      <div><label>موجودی</label><input id="pQty" type="number" min="0" step="1" inputmode="numeric" required></div>
+    </div>
+    <button class="primary">ذخیره کالا</button>
+    <button class="secondary" type="button" id="pCancel" hidden>لغو ویرایش</button>
+  </form>
+</div>
+<div class="card">
+  <h2>فهرست کالاها</h2>
+  <div class="search-box"><input id="prodSearch" placeholder="جست‌وجو در کالاها..." oninput="renderProducts()"></div>
+  <div class="list-scroll" id="productsList"></div>
+</div>
+</section>
+
+<!-- فروش جدید -->
+<section id="sell" class="panel">
+<div class="card">
+  <h2>فاکتور فروش</h2>
+  <form id="sForm">
+    <div><label>نام مشتری</label><input id="customer" required placeholder="نام مشتری" list="customerList" autocomplete="off"><datalist id="customerList"></datalist></div>
+    <div>
+      <label>محصولات فاکتور</label>
+      <div id="saleLines"></div>
+      <button type="button" class="secondary" id="addLine">＋ افزودن محصول دیگر</button>
+    </div>
+    <div class="sub">جمع فاکتور: <strong class="total" id="invoiceTotal">۰</strong></div>
+    <button class="primary">ثبت فاکتور و کسر موجودی</button>
+  </form>
+</div>
+<p class="notice">در هر فاکتور می‌توان چند محصول افزود. سیستم پیش از ثبت، موجودی هر محصول را کنترل می‌کند.</p>
+</section>
+
+<!-- فروش‌ها -->
+<section id="history" class="panel">
+<div class="card">
+  <h2>فاکتورها / فروش مشتریان</h2>
+  <div class="search-box"><input id="histSearch" placeholder="جست‌وجو بر اساس مشتری یا محصول..." oninput="renderHistory()"></div>
+  <div class="list-scroll" id="historyList"></div>
+</div>
+</section>
+
+<!-- پشتیبان -->
+<section id="backup" class="panel">
+<div class="card">
+  <h2>پشتیبان اکسل (CSV)</h2>
+  <p class="notice">خروجی شامل کالاها و فاکتورها با ردیف‌های محصولات هر فاکتور است. فایل CSV با Excel باز می‌شود. برای واردکردن، از همین قالب خروجی استفاده کنید؛ واردکردن، اطلاعات فعلی را جایگزین می‌کند.</p>
+  <button class="primary" id="exportBtn">دانلود خروجی اکسل‌خوان (CSV)</button>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <label>انتخاب فایل پشتیبان CSV برای بازیابی</label>
+  <input id="importFile" type="file" accept=".csv,text/csv">
+  <p class="notice">قبل از بازیابی، یک خروجی از اطلاعات فعلی بگیرید. فایل ورودی باید خروجی همین صفحه باشد.</p>
+</div>
+<div class="card">
+  <h2>نصب روی صفحه‌ی هوم</h2>
+  <p class="notice">این برنامه را می‌توانید مثل یک اپلیکیشن روی صفحه‌ی هوم گوشی نصب کنید.</p>
+  <div class="actions" style="justify-content:flex-start">
+    <button class="secondary" onclick="tryInstall()">نصب خودکار</button>
+    <button class="secondary" onclick="showInstallBanner()">راهنمای نصب</button>
+  </div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <h2>وضعیت PWA</h2>
+  <div id="pwaStatus" class="pwa-status">در حال بررسی...</div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <h2>درباره</h2>
+  <p class="notice"><b>مدیریت کالا، مشتری و فروش</b> — <span id="aboutVersion">نسخه ۱.۰</span><br>اطلاعات در حافظه‌ی مرورگر همین دستگاه ذخیره می‌شود.</p>
+</div>
+</section>
+
+<p class="notice" style="text-align:center;margin-top:14px">اطلاعات در حافظه مرورگر همین دستگاه ذخیره می‌شود. خروجی CSV را در جای امن نگه دارید.</p>
+</main>
+
+<!-- بنر نصب -->
+<div class="install-banner" id="installBanner">
+  <div class="install-banner-content">
+    <div class="install-banner-icon">🏪</div>
+    <div class="install-banner-text">
+      <strong>این برنامه رو نصب کن</strong>
+      <small id="installBannerText">برای دسترسی سریع، به صفحه‌ی هوم اضافه کن</small>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="primary" onclick="tryInstall()" id="installBtn">نصب</button>
+    <button class="secondary" onclick="dismissInstall()">بعداً</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   نسخه
+   ========================================================= */
+const APP_VERSION = "۱.۰";
+
+/* =========================================================
+   Manifest درون‌خطی
+   ========================================================= */
+(function injectManifest(){
+  const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0f766e"/><text x="256" y="360" font-size="300" text-anchor="middle" font-family="Arial">🏪</text></svg>`;
+  const iconUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(iconSvg)));
+  const manifest = {
+    name: "مدیریت کالا، مشتری و فروش",
+    short_name: "مدیریت فروش",
+    description: "مدیریت کالا، مشتری و فاکتور فروش",
+    start_url: ".",
+    scope: ".",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#f4f7f8",
+    theme_color: "#0f766e",
+    dir: "rtl",
+    lang: "fa",
+    icons: [
+      { src: iconUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any" },
+      { src: iconUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: "application/manifest+json"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("link");
+  link.rel = "manifest";
+  link.href = url;
+  document.head.appendChild(link);
+})();
+
+/* =========================================================
+   Service Worker
+   ========================================================= */
+(function registerSW(){
+  if(!("serviceWorker" in navigator)) return;
+  if(location.protocol !== "https:" && location.hostname !== "localhost") return;
+  const swCode = `
+    self.addEventListener('install', e => { self.skipWaiting(); });
+    self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+    self.addEventListener('fetch', e => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], {type: "text/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err=>{
+    console.warn("SW ثبت نشد:", err);
+  });
+})();
+
+/* =========================================================
+   PWA Install
+   ========================================================= */
+let deferredPrompt = null;
+const INSTALL_DISMISS_KEY = "inventory_install_dismissed";
+
+window.addEventListener("beforeinstallprompt", (e)=>{
+  e.preventDefault();
+  deferredPrompt = e;
+  el("pwaStatus").textContent = "✅ آماده‌ی نصب";
+  el("pwaStatus").className = "pwa-status";
+  if(!localStorage.getItem(INSTALL_DISMISS_KEY)) showInstallBanner();
+});
+window.addEventListener("appinstalled", ()=>{
+  toast("✅ نصب شد!");
+  dismissInstall();
+  deferredPrompt = null;
+  el("pwaStatus").textContent = "✅ نصب شده";
+});
+function showInstallBanner(){
+  el("installBanner").classList.add("show");
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if(isIOS && !deferredPrompt){
+    el("installBannerText").textContent = "در Safari: Share ← Add to Home Screen";
+    el("installBtn").style.display = "none";
+  }else if(!deferredPrompt){
+    el("installBannerText").textContent = "از منوی مرورگر گزینه‌ی Install app رو بزن";
+    el("installBtn").style.display = "none";
+  }else{
+    el("installBtn").style.display = "";
+  }
+}
+function dismissInstall(){
+  el("installBanner").classList.remove("show");
+  try{ localStorage.setItem(INSTALL_DISMISS_KEY, "1"); }catch(e){}
+}
+async function tryInstall(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    toast(outcome === "accepted" ? "✅ نصب شد" : "نصب لغو شد");
+    deferredPrompt = null;
+    dismissInstall();
+  }else{
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    if(isIOS) alert("در Safari:\n۱. Share را بزن\n۲. Add to Home Screen\n۳. Add");
+    else if(location.protocol !== "https:" && location.hostname !== "localhost")
+      alert("⚠️ برای نصب، صفحه باید از HTTPS باز شود.");
+    else
+      alert("از منوی مرورگر (سه نقطه) → Install app یا Add to Home Screen");
+  }
+}
+
+/* =========================================================
+   دیتا
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const KEY = 'inventory_customer_invoices_v2';
+let db = { products:[], sales:[] };
+
+const fmt = n => Number(n||0).toLocaleString('fa-IR',{maximumFractionDigits:2});
+const money = fmt;
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function el(id){ return document.getElementById(id); }
+function toast(msg, ms){
+  const t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>t.classList.remove("show"), ms||2200);
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(db)); render(); }
+function load(){
+  try{
+    db = JSON.parse(localStorage.getItem(KEY)) || db;
+    if(!Array.isArray(db.products) || !Array.isArray(db.sales)) throw 0;
+  }catch(e){ db = { products:[], sales:[] }; }
+}
+function pget(id){ return db.products.find(p=>p.id===id); }
+
+/* تب‌ها */
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  $(b.dataset.tab).classList.add('active');
+  if(b.dataset.tab === 'sell') updateCustomerDatalist();
+});
+
+/* =========================================================
+   رندر
+   ========================================================= */
+function render(){
+  $('prodCount').textContent = fmt(db.products.length);
+  $('stockWorth').textContent = money(db.products.reduce((a,p)=>a+p.price*p.qty,0));
+  $('salesWorth').textContent = money(db.sales.reduce((a,s)=>a+s.total,0));
+  renderProducts();
+  renderHistory();
+  updateCustomerDatalist();
+}
+
+function renderProducts(){
+  const q = ($('prodSearch')?.value || '').trim().toLowerCase();
+  const list = q ? db.products.filter(p=>p.name.toLowerCase().includes(q)) : db.products;
+  if(!list.length){
+    $('productsList').innerHTML = q
+      ? '<div class="empty">کالایی با این نام پیدا نشد.</div>'
+      : '<div class="empty">کالایی ثبت نشده است.</div>';
+    return;
+  }
+  $('productsList').innerHTML = list.map(p=>`
+    <div class="item">
+      <div>
+        <div class="name">${esc(p.name)}</div>
+        <div class="sub">قیمت: ${money(p.price)} · موجودی: <b>${fmt(p.qty)}</b></div>
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="editP('${p.id}')">ویرایش</button>
+        <button class="secondary danger" onclick="delP('${p.id}')">حذف</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderHistory(){
+  const q = ($('histSearch')?.value || '').trim().toLowerCase();
+  let list = [...db.sales].reverse();
+  if(q){
+    list = list.filter(s =>
+      (s.customer||'').toLowerCase().includes(q) ||
+      s.items.some(i => (i.name||'').toLowerCase().includes(q))
+    );
+  }
+  if(!list.length){
+    $('historyList').innerHTML = q
+      ? '<div class="empty">فاکتوری با این جست‌وجو پیدا نشد.</div>'
+      : '<div class="empty">فاکتوری ثبت نشده است.</div>';
+    return;
+  }
+  $('historyList').innerHTML = list.map(s=>`
+    <div class="item">
+      <div>
+        <div class="name">${esc(s.customer)} <span class="sub">· ${new Date(s.date).toLocaleDateString('fa-IR')}</span></div>
+        <div class="sub">${s.items.map(i=>esc(i.name)+' × '+fmt(i.qty)+' ('+money(i.price)+')').join('<br>')}</div>
+        <div class="total">جمع: ${money(s.total)}</div>
+      </div>
+      <button class="secondary danger" onclick="undoS('${s.id}')">برگشت فاکتور</button>
+    </div>`).join('');
+}
+
+function updateCustomerDatalist(){
+  const names = [...new Set(db.sales.map(s=>s.customer).filter(Boolean))];
+  $('customerList').innerHTML = names.map(n=>`<option value="${esc(n)}">`).join('');
+}
+
+/* =========================================================
+   فرم کالا
+   ========================================================= */
+$('pForm').onsubmit = e => {
+  e.preventDefault();
+  let name = $('pName').value.trim();
+  let price = Number($('pPrice').value);
+  let qty = Number($('pQty').value);
+  let eid = $('pEdit').value;
+  if(!name || price<0 || qty<0 || !Number.isInteger(qty)) return;
+  if(eid){
+    let p = pget(eid);
+    p.name = name; p.price = price; p.qty = qty;
+  }else{
+    db.products.push({id:uid(), name, price, qty});
+  }
+  $('pForm').reset();
+  $('pEdit').value = '';
+  $('pTitle').textContent = 'ثبت کالا';
+  $('pCancel').hidden = true;
+  save();
+  toast(eid ? "✅ ویرایش شد" : "✅ کالا اضافه شد");
+};
+
+window.editP = id => {
+  let p = pget(id); if(!p) return;
+  $('pEdit').value = id;
+  $('pName').value = p.name;
+  $('pPrice').value = p.price;
+  $('pQty').value = p.qty;
+  $('pTitle').textContent = 'ویرایش کالا';
+  $('pCancel').hidden = false;
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+
+$('pCancel').onclick = () => {
+  $('pForm').reset();
+  $('pEdit').value = '';
+  $('pTitle').textContent = 'ثبت کالا';
+  $('pCancel').hidden = true;
+};
+
+window.delP = id => {
+  if(db.sales.some(s=>s.items.some(i=>i.pid===id))){
+    alert('این کالا در فاکتور ثبت شده؛ ابتدا فاکتور را برگردانید.');
+    return;
+  }
+  if(confirm('کالا حذف شود؟')){
+    db.products = db.products.filter(p=>p.id!==id);
+    save();
+    toast("🗑 حذف شد");
+  }
+};
+
+/* =========================================================
+   فاکتور فروش — با جست‌وجوی محصول
+   ========================================================= */
+function addSaleLine(){
+  const wrap = document.createElement('div');
+  wrap.className = 'line-row';
+  wrap.innerHTML = `
+    <div class="line-search">
+      <label>کالا</label>
+      <input class="lSearch" placeholder="تایپ کن..." autocomplete="off">
+      <input type="hidden" class="lProd">
+      <div class="line-results"></div>
+    </div>
+    <div><label>تعداد</label><input class="lQty" type="number" min="1" step="1" inputmode="numeric" value="1" required></div>
+    <div><label>قیمت واحد</label><input class="lPrice" type="number" min="0" step="any" inputmode="decimal" required></div>
+    <button type="button" class="remove-line" aria-label="حذف ردیف">×</button>`;
+  const searchInp = wrap.querySelector('.lSearch');
+  const hiddenProd = wrap.querySelector('.lProd');
+  const results = wrap.querySelector('.line-results');
+  const priceInp = wrap.querySelector('.lPrice');
+  const qtyInp = wrap.querySelector('.lQty');
+
+  function showResults(){
+    const q = searchInp.value.trim().toLowerCase();
+    const matches = (q ? db.products.filter(p=>p.name.toLowerCase().includes(q)) : db.products)
+      .filter(p=>p.qty>0).slice(0,15);
+    if(!matches.length){
+      results.innerHTML = '<div class="line-result" style="color:#758094;cursor:default">کالایی موجود نیست</div>';
+    }else{
+      results.innerHTML = matches.map(p=>`
+        <div class="line-result" data-id="${p.id}" onmousedown="event.preventDefault()" onclick="pickLineProduct(this)">
+          <b>${esc(p.name)}</b>
+          <small>موجودی: ${fmt(p.qty)} · قیمت: ${money(p.price)}</small>
+        </div>`).join('');
+    }
+    results.classList.add('show');
+  }
+
+  searchInp.addEventListener('input', showResults);
+  searchInp.addEventListener('focus', showResults);
+  searchInp.addEventListener('blur', ()=>setTimeout(()=>results.classList.remove('show'),150));
+
+  window.pickLineProduct = function(node){
+    const id = node.dataset.id;
+    const p = pget(id); if(!p) return;
+    hiddenProd.value = id;
+    searchInp.value = p.name;
+    priceInp.value = p.price;
+    results.classList.remove('show');
+    qtyInp.focus();
+    calcTotal();
+  };
+
+  qtyInp.addEventListener('input', calcTotal);
+  priceInp.addEventListener('input', calcTotal);
+  wrap.querySelector('.remove-line').onclick = () => { wrap.remove(); calcTotal(); };
+
+  $('saleLines').append(wrap);
+  calcTotal();
+}
+
+function calcTotal(){
+  let sum = 0;
+  document.querySelectorAll('.line-row').forEach(r=>{
+    sum += (Number(r.querySelector('.lQty').value)||0) * (Number(r.querySelector('.lPrice').value)||0);
+  });
+  $('invoiceTotal').textContent = money(sum);
+}
+
+$('addLine').onclick = addSaleLine;
+
+$('sForm').onsubmit = e => {
+  e.preventDefault();
+  const rows = [...document.querySelectorAll('.line-row')];
+  const items = [];
+  if(!rows.length){ alert('حداقل یک محصول اضافه کنید'); return; }
+
+  for(let r of rows){
+    const pid = r.querySelector('.lProd').value;
+    const p = pget(pid);
+    const qty = Number(r.querySelector('.lQty').value);
+    const price = Number(r.querySelector('.lPrice').value);
+    if(!p || !Number.isInteger(qty) || qty<1 || price<0){
+      alert('اطلاعات ردیف محصول را بررسی کنید');
+      return;
+    }
+    items.push({pid:p.id, name:p.name, qty, price, total:qty*price});
+  }
+
+  const demand = {};
+  items.forEach(i => demand[i.pid] = (demand[i.pid]||0) + i.qty);
+  for(let pid in demand){
+    const p = pget(pid);
+    if(!p || demand[pid] > p.qty){
+      alert('موجودی «'+(p?.name||'کالا')+'» کافی نیست. موجودی: '+(p?.qty??0));
+      return;
+    }
+  }
+
+  items.forEach(i => pget(i.pid).qty -= i.qty);
+  db.sales.push({
+    id: uid(),
+    customer: $('customer').value.trim(),
+    date: new Date().toISOString(),
+    items,
+    total: items.reduce((a,i)=>a+i.total,0)
+  });
+  $('sForm').reset();
+  $('saleLines').innerHTML = '';
+  addSaleLine();
+  save();
+  toast("✅ فاکتور ثبت شد");
+};
+
+window.undoS = id => {
+  let s = db.sales.find(x=>x.id===id);
+  if(!s) return;
+  if(confirm('فاکتور حذف و همه اقلام آن به موجودی برگردانده شوند؟')){
+    s.items.forEach(i=>{ let p = pget(i.pid); if(p) p.qty += i.qty; });
+    db.sales = db.sales.filter(x=>x.id!==id);
+    save();
+    toast("↩️ فاکتور برگشت خورد");
+  }
+};
+
+/* =========================================================
+   CSV
+   ========================================================= */
+function csvCell(v){ let s = String(v??''); return '"'+s.replace(/"/g,'""')+'"'; }
+function makeCSV(){
+  const rows = [['نوع','شناسه','نام کالا','قیمت پایه','موجودی','مشتری','تاریخ فاکتور','شناسه فاکتور','تعداد فروخته','قیمت فروش واحد']];
+  db.products.forEach(p=>rows.push(['کالا', p.id, p.name, p.price, p.qty, '', '', '', '', '']));
+  db.sales.forEach(s => s.items.forEach(i => rows.push(['قلم فروش', i.pid, i.name, '', '', s.customer, s.date, s.id, i.qty, i.price])));
+  return '\ufeff' + rows.map(r=>r.map(csvCell).join(',')).join('\r\n');
+}
+
+$('exportBtn').onclick = () => {
+  const blob = new Blob([makeCSV()], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'inventory_backup.csv'; a.click();
+  URL.revokeObjectURL(url);
+};
+
+function parseCSV(text){
+  text = text.replace(/^\ufeff/,'');
+  const rows = []; let row = [], cell = '', quoted = false;
+  for(let i=0; i<text.length; i++){
+    const c = text[i];
+    if(quoted){
+      if(c === '"' && text[i+1] === '"'){ cell += '"'; i++; }
+      else if(c === '"') quoted = false;
+      else cell += c;
+    }else{
+      if(c === '"') quoted = true;
+      else if(c === ','){ row.push(cell); cell = ''; }
+      else if(c === '\n'){ row.push(cell.replace(/\r$/,'')); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+  }
+  if(cell.length || row.length){ row.push(cell.replace(/\r$/,'')); rows.push(row); }
+  return rows;
+}
+
+$('importFile').onchange = async e => {
+  const file = e.target.files[0]; if(!file) return;
+  try{
+    const rows = parseCSV(await file.text());
+    if(rows[0]?.[0] !== 'نوع' || rows[0]?.[7] !== 'شناسه فاکتور')
+      throw Error('ساختار فایل با قالب پشتیبان این صفحه سازگار نیست.');
+
+    const products = [];
+    const salesMap = new Map();
+
+    for(const r of rows.slice(1)){
+      if(r[0] === 'کالا'){
+        products.push({id:r[1], name:r[2], price:Number(r[3]), qty:Number(r[4])});
+      }else if(r[0] === 'قلم فروش'){
+        const sid = r[7];
+        if(!salesMap.has(sid)) salesMap.set(sid, {id:sid, customer:r[5], date:r[6], items:[], total:0});
+        const s = salesMap.get(sid);
+        const qty = Number(r[8]), price = Number(r[9]);
+        s.items.push({pid:r[1], name:r[2], qty, price, total:qty*price});
+        s.total += qty*price;
+      }
+    }
+
+    if(!products.length && !salesMap.size) throw Error('فایل خالی است.');
+    if(!confirm('بازیابی، اطلاعات فعلی را جایگزین می‌کند. ادامه می‌دهید؟')) return;
+
+    db = {products, sales:[...salesMap.values()]};
+    save();
+    alert('اطلاعات از فایل بازیابی شد.');
+  }catch(err){
+    alert('خطا در واردکردن فایل: ' + err.message);
+  }finally{
+    e.target.value = '';
+  }
+};
+
+/* =========================================================
+   راه‌اندازی
+   ========================================================= */
+el("versionLabel").textContent = "نسخه " + APP_VERSION;
+el("aboutVersion").textContent = "نسخه " + APP_VERSION;
+
+load();
+render();
+addSaleLine();
+
+setTimeout(()=>{
+  const s = el("pwaStatus");
+  const isHttps = location.protocol === "https:" || location.hostname === "localhost";
+  const hasSW = "serviceWorker" in navigator;
+  if(!isHttps){
+    s.textContent = "⚠️ صفحه با file:// باز شده — نصب کار نمی‌کند";
+    s.className = "pwa-status err";
+  }else if(!hasSW){
+    s.textContent = "⚠️ مرورگر از Service Worker پشتیبانی نمی‌کند";
+    s.className = "pwa-status warn";
+  }else if(window.matchMedia("(display-mode: standalone)").matches){
+    s.textContent = "✅ به‌صورت اپ نصب‌شده اجرا می‌شود";
+    s.className = "pwa-status";
+  }else if(deferredPrompt){
+    s.textContent = "✅ آماده‌ی نصب";
+    s.className = "pwa-status";
+  }else{
+    s.textContent = "⏳ منتظر رویداد نصب...";
+    s.className = "pwa-status warn";
+  }
+}, 1500);
+</script>
+</body>
+  </html>
