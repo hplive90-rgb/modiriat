@@ -33,6 +33,7 @@ h2{font-size:15px;margin:0 0 12px}
 label{display:block;color:var(--muted);font-size:12px;margin:0 0 5px}
 input,select{width:100%;min-width:0;padding:11px;border:1px solid #cfd8df;border-radius:10px;background:white;font:inherit;color:inherit}
 input:focus,select:focus{outline:2px solid #99d8cd}
+input:disabled,select:disabled{background:#f3f4f6;color:#9ca3af}
 form{display:grid;gap:10px}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .primary{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px;font-weight:bold;font-family:inherit;cursor:pointer}
@@ -107,6 +108,11 @@ form{display:grid;gap:10px}
 .discount-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .discount-hint{font-size:11px;color:var(--muted);margin-top:3px}
 
+/* حالت ویرایش فاکتور */
+.edit-banner{background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:9px 12px;font-size:12px;color:#92400e;margin-bottom:10px;display:none}
+.edit-banner.show{display:block}
+.edit-banner b{display:block;margin-bottom:2px}
+
 @media(max-width:380px){
   .fields{grid-template-columns:1fr}
   .line-row{grid-template-columns:minmax(0,1fr) 58px 76px 28px;gap:3px}
@@ -120,8 +126,8 @@ form{display:grid;gap:10px}
 <body>
 <header>
 <h1>🏪 مدیریت کالا، مشتری و فروش</h1>
-<p>فاکتور با تخفیف، مشتری یکتا و وضعیت تسویه</p>
-<p class="ver" id="versionLabel">نسخه ۱.۱</p>
+<p>فاکتور با تخفیف، مشتری یکتا، وضعیت تسویه و ویرایش فاکتور باز</p>
+<p class="ver" id="versionLabel">نسخه ۱.۲</p>
 </header>
 <main>
 <div class="stats">
@@ -160,11 +166,16 @@ form{display:grid;gap:10px}
 </div>
 </section>
 
-<!-- فروش جدید -->
+<!-- فروش جدید / ویرایش فاکتور -->
 <section id="sell" class="panel">
 <div class="card">
-  <h2>فاکتور فروش</h2>
+  <div class="edit-banner" id="editBanner">
+    <b>✏️ حالت ویرایش فاکتور باز</b>
+    <span id="editBannerText">در حال ویرایش فاکتور مشتری...</span>
+  </div>
+  <h2 id="sellTitle">فاکتور فروش</h2>
   <form id="sForm">
+    <input type="hidden" id="saleEditId">
     <div><label>نام مشتری (یکتا)</label><input id="customer" required placeholder="نام مشتری جدید" autocomplete="off"><div class="discount-hint" id="customerHint"></div></div>
     <div>
       <label>محصولات فاکتور</label>
@@ -193,10 +204,11 @@ form{display:grid;gap:10px}
         <option value="closed">✅ بسته (تسویه شده)</option>
       </select>
     </div>
-    <button class="primary">ثبت فاکتور و کسر موجودی</button>
+    <button class="primary" id="sellSubmitBtn">ثبت فاکتور و کسر موجودی</button>
+    <button class="secondary" type="button" id="editCancelBtn" hidden>لغو ویرایش</button>
   </form>
 </div>
-<p class="notice">نام مشتری باید یکتا باشد. هر مشتری فقط یک فاکتور باز می‌تواند داشته باشد. در هر فاکتور می‌توان چند محصول افزود. سیستم پیش از ثبت، موجودی هر محصول را کنترل می‌کند.</p>
+<p class="notice">نام مشتری باید یکتا باشد. هر مشتری فقط یک فاکتور باز می‌تواند داشته باشد. فاکتورهای باز از بخش «فروش‌ها» قابل ویرایش هستند؛ با ویرایش، موجودی کالاها به‌طور خودکار اصلاح می‌شود.</p>
 </section>
 
 <!-- فروش‌ها -->
@@ -236,7 +248,7 @@ form{display:grid;gap:10px}
   <div id="pwaStatus" class="pwa-status">در حال بررسی...</div>
   <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
   <h2>درباره</h2>
-  <p class="notice"><b>مدیریت کالا، مشتری و فروش</b> — <span id="aboutVersion">نسخه ۱.۱</span><br>اطلاعات در حافظه‌ی مرورگر همین دستگاه ذخیره می‌شود.</p>
+  <p class="notice"><b>مدیریت کالا، مشتری و فروش</b> — <span id="aboutVersion">نسخه ۱.۲</span><br>اطلاعات در حافظه‌ی مرورگر همین دستگاه ذخیره می‌شود.</p>
 </div>
 </section>
 
@@ -264,7 +276,7 @@ form{display:grid;gap:10px}
 /* =========================================================
    نسخه
    ========================================================= */
-const APP_VERSION = "۱.۱";
+const APP_VERSION = "۱.۲";
 
 /* =========================================================
    Manifest درون‌خطی
@@ -395,21 +407,25 @@ function load(){
   try{
     db = JSON.parse(localStorage.getItem(KEY)) || db;
     if(!Array.isArray(db.products) || !Array.isArray(db.sales)) throw 0;
-    // مهاجرت: فاکتورهای قدیمی بدون وضعیت تسویه
     db.sales.forEach(s => {
       if(typeof s.discountAmount !== 'number') s.discountAmount = 0;
       if(typeof s.discountPercent !== 'number') s.discountPercent = 0;
       if(typeof s.payStatus !== 'string') s.payStatus = 'closed';
+      if(typeof s.subTotal !== 'number') s.subTotal = s.items.reduce((a,i)=>a+i.total,0);
     });
   }catch(e){ db = { products:[], sales:[] }; }
 }
 function pget(id){ return db.products.find(p=>p.id===id); }
 function sget(id){ return db.sales.find(s=>s.id===id); }
 
-/* مشتری یکتا: پیدا کردن فاکتور باز مشتری */
-function findOpenSaleByCustomer(name){
+/* مشتری یکتا: پیدا کردن فاکتور باز مشتری (با استثنای فاکتور در حال ویرایش) */
+function findOpenSaleByCustomer(name, exceptId){
   if(!name) return null;
-  return db.sales.find(s => s.payStatus === 'open' && (s.customer||'').trim() === name);
+  return db.sales.find(s =>
+    s.payStatus === 'open' &&
+    (s.customer||'').trim() === name &&
+    s.id !== exceptId
+  );
 }
 
 /* تب‌ها */
@@ -488,6 +504,9 @@ function renderHistory(){
     const discLine = (s.discountAmount > 0)
       ? `<div class="sub">تخفیف: ${money(s.discountAmount)}${s.discountPercent>0?` (${fmt(s.discountPercent)}٪)`:''}</div>`
       : '';
+    const editBtn = isOpen
+      ? `<button class="secondary" onclick="editSale('${s.id}')">✏️ ویرایش</button>`
+      : '';
     return `
     <div class="item">
       <div>
@@ -497,6 +516,7 @@ function renderHistory(){
         <div class="total">جمع: ${money(s.total)}</div>
       </div>
       <div class="actions" style="flex-direction:column;align-items:flex-end">
+        ${editBtn}
         <button class="secondary" onclick="togglePayStatus('${s.id}')">${isOpen ? '✅ تسویه شد' : '🔓 باز کن'}</button>
         <button class="secondary danger" onclick="undoS('${s.id}')">برگشت فاکتور</button>
       </div>
@@ -561,7 +581,7 @@ window.delP = id => {
 /* =========================================================
    فاکتور فروش — با تخفیف و وضعیت تسویه
    ========================================================= */
-function addSaleLine(){
+function addSaleLine(prefill){
   const wrap = document.createElement('div');
   wrap.className = 'line-row';
   wrap.innerHTML = `
@@ -582,8 +602,9 @@ function addSaleLine(){
 
   function showResults(){
     const q = searchInp.value.trim().toLowerCase();
+    // در حالت ویرایش، محصولات موجود در فاکتور هم نمایش داده می‌شوند
     const matches = (q ? db.products.filter(p=>p.name.toLowerCase().includes(q)) : db.products)
-      .filter(p=>p.qty>0).slice(0,15);
+      .slice(0,15);
     if(!matches.length){
       results.innerHTML = '<div class="line-result" style="color:#758094;cursor:default">کالایی موجود نیست</div>';
     }else{
@@ -615,6 +636,13 @@ function addSaleLine(){
   priceInp.addEventListener('input', calcTotal);
   wrap.querySelector('.remove-line').onclick = () => { wrap.remove(); calcTotal(); };
 
+  if(prefill){
+    hiddenProd.value = prefill.pid;
+    searchInp.value = prefill.name;
+    qtyInp.value = prefill.qty;
+    priceInp.value = prefill.price;
+  }
+
   $('saleLines').append(wrap);
   calcTotal();
 }
@@ -634,14 +662,15 @@ function calcTotal(){
   $('invoiceTotal').textContent = money(total);
 }
 
-$('addLine').onclick = addSaleLine;
+$('addLine').onclick = () => addSaleLine();
 
 /* بررسی یکتایی مشتری هنگام تایپ */
 $('customer').addEventListener('input', ()=>{
   const name = $('customer').value.trim();
   const hint = $('customerHint');
   if(!name){ hint.textContent = ''; return; }
-  const openSale = findOpenSaleByCustomer(name);
+  const editId = $('saleEditId').value;
+  const openSale = findOpenSaleByCustomer(name, editId);
   if(openSale){
     hint.textContent = '⚠️ این مشتری یک فاکتور باز دارد. ابتدا آن را تسویه کنید.';
     hint.style.color = '#92400e';
@@ -651,12 +680,75 @@ $('customer').addEventListener('input', ()=>{
   }
 });
 
+/* =========================================================
+   ویرایش فاکتور باز
+   ========================================================= */
+window.editSale = id => {
+  const s = sget(id);
+  if(!s) return;
+  if(s.payStatus !== 'open'){
+    alert('فقط فاکتورهای باز قابل ویرایش هستند.');
+    return;
+  }
+
+  // پر کردن فرم
+  $('saleEditId').value = s.id;
+  $('customer').value = s.customer;
+  $('discountAmount').value = s.discountAmount || 0;
+  $('discountPercent').value = s.discountPercent || 0;
+  $('payStatus').value = s.payStatus;
+  $('customerHint').textContent = '';
+
+  // پاک کردن ردیف‌ها و بازسازی از فاکتور
+  $('saleLines').innerHTML = '';
+  s.items.forEach(it => addSaleLine(it));
+
+  // تغییر ظاهر
+  $('sellTitle').textContent = 'ویرایش فاکتور فروش';
+  $('editBanner').classList.add('show');
+  $('editBannerText').textContent = 'در حال ویرایش فاکتور مشتری: ' + s.customer;
+  $('sellSubmitBtn').textContent = 'ذخیره تغییرات';
+  $('editCancelBtn').hidden = false;
+
+  calcTotal();
+
+  // رفتن به تب فروش
+  document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));
+  document.querySelector('.tab[data-tab="sell"]').classList.add('active');
+  $('sell').classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+
+function resetSaleForm(){
+  $('sForm').reset();
+  $('saleEditId').value = '';
+  $('discountAmount').value = 0;
+  $('discountPercent').value = 0;
+  $('payStatus').value = 'open';
+  $('customerHint').textContent = '';
+  $('saleLines').innerHTML = '';
+  addSaleLine();
+
+  $('sellTitle').textContent = 'فاکتور فروش';
+  $('editBanner').classList.remove('show');
+  $('sellSubmitBtn').textContent = 'ثبت فاکتور و کسر موجودی';
+  $('editCancelBtn').hidden = true;
+}
+
+$('editCancelBtn').onclick = () => {
+  if(confirm('ویرایش فاکتور لغو شود؟')) resetSaleForm();
+};
+
+/* =========================================================
+   ثبت / ذخیره فاکتور
+   ========================================================= */
 $('sForm').onsubmit = e => {
   e.preventDefault();
+  const editId = $('saleEditId').value;
   const customer = $('customer').value.trim();
   if(!customer){ alert('نام مشتری را وارد کنید'); return; }
 
-  const openSale = findOpenSaleByCustomer(customer);
+  const openSale = findOpenSaleByCustomer(customer, editId);
   if(openSale){
     alert('مشتری «'+customer+'» یک فاکتور باز دارد. ابتدا آن را تسویه کنید.');
     return;
@@ -678,6 +770,63 @@ $('sForm').onsubmit = e => {
     items.push({pid:p.id, name:p.name, qty, price, total:qty*price});
   }
 
+  // محاسبه تخفیف
+  const subTotal = items.reduce((a,i)=>a+i.total,0);
+  const discAmt = Number($('discountAmount').value) || 0;
+  const discPct = Number($('discountPercent').value) || 0;
+  const discTotal = Math.min(subTotal, discAmt + (subTotal * discPct / 100));
+  const total = Math.max(0, subTotal - discTotal);
+  const payStatus = $('payStatus').value;
+
+  /* ---------- حالت ویرایش ---------- */
+  if(editId){
+    const old = sget(editId);
+    if(!old){ alert('فاکتور پیدا نشد'); return; }
+    if(old.payStatus !== 'open'){ alert('این فاکتور بسته است و قابل ویرایش نیست'); return; }
+
+    // برگرداندن موجودی اقلام قدیمی
+    old.items.forEach(i => {
+      const p = pget(i.pid);
+      if(p) p.qty += i.qty;
+    });
+
+    // بررسی موجودی برای اقلام جدید
+    const demand = {};
+    items.forEach(i => demand[i.pid] = (demand[i.pid]||0) + i.qty);
+    for(let pid in demand){
+      const p = pget(pid);
+      if(!p || demand[pid] > p.qty){
+        // برگرداندن تغییرات: دوباره اقلام جدید را از موجودی کم نکردیم، پس کاری لازم نیست
+        alert('موجودی «'+(p?.name||'کالا')+'» کافی نیست. موجودی: '+(p?.qty??0));
+        // بازگرداندن اقلام قدیمی به فاکتور (یعنی دوباره کسر از موجودی)
+        old.items.forEach(i => {
+          const pp = pget(i.pid);
+          if(pp) pp.qty -= i.qty;
+        });
+        return;
+      }
+    }
+
+    // کسر موجودی اقلام جدید
+    items.forEach(i => pget(i.pid).qty -= i.qty);
+
+    // به‌روزرسانی فاکتور
+    old.customer = customer;
+    old.items = items;
+    old.subTotal = subTotal;
+    old.discountAmount = discTotal;
+    old.discountPercent = discPct;
+    old.total = total;
+    old.payStatus = payStatus;
+    old.date = new Date().toISOString();
+
+    save();
+    toast("✅ فاکتور ویرایش شد");
+    resetSaleForm();
+    return;
+  }
+
+  /* ---------- حالت ثبت جدید ---------- */
   const demand = {};
   items.forEach(i => demand[i.pid] = (demand[i.pid]||0) + i.qty);
   for(let pid in demand){
@@ -687,13 +836,6 @@ $('sForm').onsubmit = e => {
       return;
     }
   }
-
-  // محاسبه تخفیف
-  const subTotal = items.reduce((a,i)=>a+i.total,0);
-  const discAmt = Number($('discountAmount').value) || 0;
-  const discPct = Number($('discountPercent').value) || 0;
-  const discTotal = Math.min(subTotal, discAmt + (subTotal * discPct / 100));
-  const total = Math.max(0, subTotal - discTotal);
 
   items.forEach(i => pget(i.pid).qty -= i.qty);
   db.sales.push({
@@ -705,19 +847,17 @@ $('sForm').onsubmit = e => {
     discountAmount: discTotal,
     discountPercent: discPct,
     total,
-    payStatus: $('payStatus').value
+    payStatus
   });
 
-  $('sForm').reset();
-  $('discountAmount').value = 0;
-  $('discountPercent').value = 0;
-  $('customerHint').textContent = '';
-  $('saleLines').innerHTML = '';
-  addSaleLine();
   save();
   toast("✅ فاکتور ثبت شد");
+  resetSaleForm();
 };
 
+/* =========================================================
+   تغییر وضعیت / برگشت فاکتور
+   ========================================================= */
 window.togglePayStatus = id => {
   const s = sget(id);
   if(!s) return;
@@ -732,6 +872,10 @@ window.undoS = id => {
   if(confirm('فاکتور حذف و همه اقلام آن به موجودی برگردانده شوند؟')){
     s.items.forEach(i=>{ let p = pget(i.pid); if(p) p.qty += i.qty; });
     db.sales = db.sales.filter(x=>x.id!==id);
+
+    // اگر همین فاکتور در حال ویرایش بود، فرم را ریست کنیم
+    if($('saleEditId').value === id) resetSaleForm();
+
     save();
     toast("↩️ فاکتور برگشت خورد");
   }
@@ -824,6 +968,7 @@ $('importFile').onchange = async e => {
     if(!confirm('بازیابی، اطلاعات فعلی را جایگزین می‌کند. ادامه می‌دهید؟')) return;
 
     db = {products, sales:[...salesMap.values()]};
+    resetSaleForm();
     save();
     alert('اطلاعات از فایل بازیابی شد.');
   }catch(err){
@@ -866,4 +1011,4 @@ setTimeout(()=>{
 }, 1500);
 </script>
 </body>
-    </html>
+</html>
