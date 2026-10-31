@@ -1,0 +1,1911 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>مدیریت کالا، مشتری و فروش</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="مدیریت فروش">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="مدیریت فروش">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f766e'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle'%3E%F0%9F%8F%AA%3C/text%3E%3C/svg%3E">
+
+<style>
+:root{
+  --bg:#f4f7f8;--card:#fff;--ink:#17212b;--muted:#667085;
+  --brand:#0f766e;--brand-soft:#dff4ef;--brand-dark:#075e56;
+  --line:#e4e9ed;--danger:#b42318;--warn:#92400e;--ok:#065f46;--profit:#166534;
+  --accent:#e0f2fe;--accent-border:#7dd3fc;
+}
+[data-theme="blue"]{--bg:#f0f6fc;--brand:#1d4ed8;--brand-soft:#dbeafe;--brand-dark:#1e3a8a;--profit:#15803d;--accent:#e0f2fe}
+[data-theme="purple"]{--bg:#f6f4fc;--brand:#7c3aed;--brand-soft:#ede9fe;--brand-dark:#5b21b6;--profit:#15803d}
+[data-theme="orange"]{--bg:#fdf6f0;--brand:#ea580c;--brand-soft:#ffedd5;--brand-dark:#9a3412;--profit:#15803d}
+[data-theme="pink"]{--bg:#fdf2f8;--brand:#db2777;--brand-soft:#fce7f3;--brand-dark:#9d174d;--profit:#15803d}
+[data-theme="dark"]{
+  --bg:#0f172a;--card:#1e293b;--ink:#f1f5f9;--muted:#94a3b8;
+  --brand:#14b8a6;--brand-soft:#134e4a;--brand-dark:#5eead4;
+  --line:#334155;--danger:#f87171;--warn:#fbbf24;--ok:#4ade80;--profit:#4ade80;
+  --accent:#1e3a8a;--accent-border:#3b82f6;
+}
+[data-theme="dark"] input,[data-theme="dark"] select{background:#0f172a;border-color:#475569;color:#f1f5f9}
+[data-theme="dark"] .line-result:hover{background:#334155}
+[data-theme="dark"] .price-section{background:#0f172a}
+[data-theme="dark"] .price-history{background:#0f172a}
+[data-theme="dark"] .stat{background:var(--card)}
+[data-theme="dark"] .stat.profit-card{background:#052e16;border-color:#166534}
+[data-theme="dark"] .price-item.current-row input{background:#052e16;border-color:#166534}
+[data-theme="dark"] .remove-line,[data-theme="dark"] .del-price{background:#0f172a}
+[data-theme="dark"] .install-banner{background:var(--card);color:var(--ink)}
+[data-theme="dark"] .warn-line input.lPrice{background:#7c2d12;border-color:#ea580c}
+[data-theme="dark"] .stat.warn-card{background:#78350f;border-color:#b45309}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px Tahoma,Arial,sans-serif;
+  padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+header{background:var(--brand);color:white;padding:17px 15px calc(17px + env(safe-area-inset-top));position:sticky;top:0;z-index:3}
+header h1{font-size:18px;margin:0 0 5px}
+header p{margin:0;color:rgba(255,255,255,.85);font-size:12px}
+header .ver{color:rgba(255,255,255,.7);font-size:11px;margin-top:4px}
+main{max-width:720px;margin:auto;padding:12px}
+
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;background:var(--card);
+  border-top:1px solid var(--line);display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom);
+  box-shadow:0 -4px 12px rgba(0,0,0,.06);max-width:720px;margin:0 auto;
+}
+.bnav-btn{flex:1;background:transparent;border:0;padding:10px 4px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  color:var(--muted);cursor:pointer;font-family:inherit;font-size:11px;
+  transition:color .15s,background .15s;position:relative}
+.bnav-btn .icon{font-size:20px;line-height:1}
+.bnav-btn.active{color:var(--brand);font-weight:bold}
+.bnav-btn.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;
+  background:var(--brand);border-radius:0 0 3px 3px}
+.bnav-btn:active{background:var(--brand-soft)}
+
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:11px}
+h2{font-size:15px;margin:0 0 12px}
+label{display:block;color:var(--muted);font-size:12px;margin:0 0 5px}
+input,select{width:100%;min-width:0;padding:11px;border:1px solid #cfd8df;border-radius:10px;background:var(--card);font:inherit;color:inherit}
+input:focus,select:focus{outline:2px solid var(--brand);outline-offset:1px}
+form{display:grid;gap:10px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fields3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+.primary{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px;font-weight:bold;font-family:inherit;cursor:pointer}
+.primary:active{opacity:.85}
+.secondary{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:inherit;cursor:pointer;color:inherit}
+.small-btn{font-size:12px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer;font-family:inherit;color:inherit}
+.danger{color:var(--danger);border-color:#efc2bf}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
+.stat small{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}
+.stat strong{font-size:14px;overflow-wrap:anywhere}
+.stat.profit-card{background:var(--brand-soft);border-color:var(--brand);grid-column:1/-1}
+.stat.profit-card strong{color:var(--profit);font-size:16px}
+.stat.warn-card{background:#fef3c7;border-color:#fcd34d}
+.stat.warn-card strong{color:var(--warn)}
+
+.item{border-top:1px solid var(--line);padding:11px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.item:first-child{border-top:0}
+.name{font-weight:bold;margin-bottom:4px}
+.sub{font-size:12px;color:var(--muted);line-height:1.7}
+.actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.total{color:var(--brand);font-weight:bold}
+.profit{color:var(--profit);font-weight:bold}
+.empty{text-align:center;color:var(--muted);padding:16px}
+.notice{font-size:11px;color:var(--muted);line-height:1.8}
+
+.line-row{display:grid;grid-template-columns:minmax(0,1fr) 74px 90px 32px;gap:5px;align-items:end;margin:8px 0}
+.line-row label{font-size:11px}
+.line-row input,.line-row select{padding:9px;font-size:12px}
+.remove-line{height:38px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--danger);cursor:pointer;font-size:16px;font-family:inherit}
+.line-search{position:relative}
+.line-search input{width:100%}
+.line-results{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid #cfd8df;border-radius:9px;margin-top:3px;max-height:220px;overflow-y:auto;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.15);display:none}
+.line-results.show{display:block}
+.line-result{padding:9px 11px;cursor:pointer;border-bottom:1px solid var(--line);font-size:12px}
+.line-result:last-child{border-bottom:0}
+.line-result:hover{background:var(--brand-soft)}
+.line-result b{display:block}
+.line-result small{color:var(--muted);font-size:11px}
+
+.search-box{position:relative;margin-bottom:10px}
+.search-box input{padding-right:34px}
+.search-box::before{content:"🔎";position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;opacity:.6}
+.list-scroll{max-height:560px;overflow-y:auto;margin:0 -13px;padding:0 13px}
+.list-scroll::-webkit-scrollbar{width:6px}
+.list-scroll::-webkit-scrollbar-thumb{background:#cfd8df;border-radius:3px}
+
+.install-banner{position:fixed;bottom:80px;left:0;right:0;background:var(--card);padding:12px;box-shadow:0 -4px 15px rgba(0,0,0,.15);display:none;z-index:998;border-radius:14px 14px 0 0;max-width:720px;margin:0 auto}
+.install-banner.show{display:block;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.install-banner-content{display:flex;gap:10px;align-items:center}
+.install-banner-icon{width:48px;height:48px;border-radius:11px;flex-shrink:0;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:26px}
+.install-banner-text{flex:1;min-width:0}
+.install-banner-text strong{display:block;font-size:14px;margin-bottom:2px}
+.install-banner-text small{color:var(--muted);font-size:12px;line-height:1.4}
+.install-banner .actions{margin-top:10px;flex-wrap:nowrap}
+.install-banner .actions button{font-size:13px;padding:9px;flex:1}
+
+.pwa-status{font-size:11px;padding:4px 8px;border-radius:6px;background:#d1fae5;color:#065f46;display:inline-block}
+.pwa-status.warn{background:#fef3c7;color:#92400e}
+.pwa-status.err{background:#fee2e2;color:#991b1b}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#17212b;color:white;padding:11px 18px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;max-width:90%}
+.toast.show{opacity:1}
+
+.badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:6px;font-weight:bold;margin-right:4px}
+.badge.open{background:#fef3c7;color:var(--warn)}
+.badge.closed{background:#d1fae5;color:var(--ok)}
+.badge.current{background:var(--accent);color:#075985;border:1px solid var(--accent-border)}
+.badge.future{background:#f1f5f9;color:#475569}
+.badge.history{background:#f3f4f6;color:#6b7280;text-decoration:line-through}
+.badge.lot{background:#fef3c7;color:#92400e;font-size:10px}
+
+.filter-bar{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
+.filter-btn{flex:1;min-width:80px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:8px 5px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--ink)}
+.filter-btn.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-dark);font-weight:bold}
+
+.discount-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.discount-hint{font-size:11px;color:var(--muted);margin-top:3px}
+
+.edit-banner{background:#fef3c7;border:1px solid #fcd34d;border-radius:10px;padding:9px 12px;font-size:12px;color:#92400e;margin-bottom:10px;display:none}
+.edit-banner.show{display:block}
+.edit-banner b{display:block;margin-bottom:2px}
+
+.warn-line input.lPrice{background:#fff7ed;border-color:#fdba74}
+
+.price-section{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:10px}
+.price-section h3{font-size:12px;margin:0 0 8px;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.price-list{display:flex;flex-direction:column;gap:6px}
+.price-item{display:grid;grid-template-columns:1fr 110px 32px;gap:5px;align-items:center}
+.price-item input{padding:8px;font-size:12px}
+.price-item .del-price{height:32px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--danger);cursor:pointer;font-size:14px;font-family:inherit}
+.price-item.current-row input{background:#ecfdf5;border-color:#a7f3d0}
+[data-theme="dark"] .price-item.current-row input{background:#052e16;border-color:#166534}
+.price-note{font-size:11px;color:var(--muted);margin-top:6px}
+
+.price-history-btn{background:none;border:0;color:var(--brand);cursor:pointer;font-size:11px;font-family:inherit;padding:0;text-decoration:underline}
+.price-history{display:none;background:var(--bg);border-radius:8px;padding:8px;margin-top:6px;font-size:11px}
+.price-history.show{display:block}
+.price-history-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
+.price-history-row:last-child{border-bottom:0}
+
+.theme-picker{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.theme-swatch{border:2px solid var(--line);border-radius:10px;aspect-ratio:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .15s}
+.theme-swatch:hover{transform:scale(1.05)}
+.theme-swatch.active{border-color:var(--brand);border-width:3px;box-shadow:0 0 0 2px var(--brand-soft)}
+
+.stat-block{margin-bottom:14px}
+.stat-block h3{font-size:13px;color:var(--brand);margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.stat-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px dashed var(--line)}
+.stat-row:last-child{border-bottom:0}
+.stat-row .label{color:var(--muted)}
+.stat-row .value{font-weight:bold}
+.stat-row.profit .value{color:var(--profit)}
+.stat-row.loss .value{color:var(--danger)}
+
+/* ============================================================
+   کامپوننت تاریخ شمسی
+   ============================================================ */
+.jp-date{
+  position:relative;
+  display:flex;gap:4px;
+  align-items:stretch;
+}
+.jp-date .jp-input{
+  flex:1;min-width:0;
+  padding:11px;border:1px solid #cfd8df;border-radius:10px;
+  background:var(--card);font:inherit;color:inherit;
+  text-align:center;font-variant-numeric:tabular-nums;
+  cursor:pointer;
+}
+.jp-date .jp-input:focus{outline:2px solid var(--brand);outline-offset:1px}
+.jp-date .jp-cal-btn{
+  padding:0 10px;border:1px solid #cfd8df;border-radius:10px;
+  background:var(--card);cursor:pointer;color:var(--brand);
+  font-size:16px;font-family:inherit;
+}
+.jp-date .jp-cal-btn:hover{background:var(--brand-soft)}
+
+.jp-picker{
+  position:absolute;top:100%;left:0;right:0;margin-top:4px;
+  background:var(--card);border:1px solid #cfd8df;border-radius:12px;
+  padding:10px;z-index:200;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  display:none;
+  min-width:260px;
+}
+.jp-picker.show{display:block}
+.jp-picker-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:8px;gap:4px;
+}
+.jp-picker-head button{
+  background:var(--bg);border:1px solid var(--line);border-radius:6px;
+  width:30px;height:30px;cursor:pointer;font-size:14px;font-family:inherit;
+  color:var(--ink);
+}
+.jp-picker-head button:hover{background:var(--brand-soft)}
+.jp-picker-title{
+  flex:1;text-align:center;font-weight:bold;font-size:13px;
+}
+.jp-picker-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:3px;
+}
+.jp-picker-dayname{
+  font-size:10px;text-align:center;color:var(--muted);
+  padding:4px 0;font-weight:bold;
+}
+.jp-picker-cell{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:6px;cursor:pointer;font-size:12px;
+  background:transparent;border:0;font-family:inherit;color:var(--ink);
+  font-variant-numeric:tabular-nums;
+}
+.jp-picker-cell:hover{background:var(--brand-soft)}
+.jp-picker-cell.out{color:var(--muted);opacity:.4}
+.jp-picker-cell.today{background:#fef3c7;color:#92400e;font-weight:bold}
+.jp-picker-cell.selected{background:var(--brand);color:#fff;font-weight:bold}
+.jp-picker-foot{
+  display:flex;justify-content:space-between;margin-top:8px;gap:4px;
+}
+.jp-picker-foot button{
+  flex:1;padding:6px;border:1px solid var(--line);border-radius:6px;
+  background:var(--bg);cursor:pointer;font-family:inherit;font-size:11px;
+  color:var(--ink);
+}
+.jp-picker-foot button:hover{background:var(--brand-soft)}
+
+@media(max-width:380px){
+  .fields,.fields3{grid-template-columns:1fr}
+  .line-row{grid-template-columns:minmax(0,1fr) 58px 76px 28px;gap:3px}
+  .line-row input,.line-row select{padding:8px 5px}
+  .discount-row{grid-template-columns:1fr}
+  .price-item{grid-template-columns:1fr 90px 28px}
+  .bnav-btn{font-size:10px}
+  .bnav-btn .icon{font-size:18px}
+  .theme-picker{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>🏪 مدیریت کالا، مشتری و فروش</h1>
+<p>تاریخ شمسی · قیمت زمان‌دار · FIFO دقیق · تم رنگی</p>
+<p class="ver" id="versionLabel">نسخه ۲.۲</p>
+</header>
+<main>
+
+<section id="products" class="panel active">
+<div class="card">
+  <h2 id="pTitle">ثبت کالا</h2>
+  <form id="pForm">
+    <input type="hidden" id="pEdit">
+    <div><label>نام محصول</label><input id="pName" required placeholder="مثلاً محصول الف"></div>
+
+    <div class="price-section">
+      <h3>💰 قیمت خرید زمان‌دار <button type="button" class="small-btn" onclick="addPriceRow('buy','pBuyPrices')">＋ افزودن</button></h3>
+      <div class="price-list" id="pBuyPrices"></div>
+      <div class="price-note">تاریخ‌ها شمسی هستند.</div>
+    </div>
+
+    <div class="price-section">
+      <h3>🏷 قیمت فروش زمان‌دار <button type="button" class="small-btn" onclick="addPriceRow('sell','pSellPrices')">＋ افزودن</button></h3>
+      <div class="price-list" id="pSellPrices"></div>
+      <div class="price-note">هنگام ثبت فاکتور، قیمت فعال در تاریخ فاکتور خودکار پر می‌شود.</div>
+    </div>
+
+    <div class="discount-hint" id="pMarginHint"></div>
+    <button class="primary">ذخیره کالا</button>
+    <button class="secondary" type="button" id="pCancel" hidden>لغو ویرایش</button>
+  </form>
+</div>
+
+<div class="card" id="purchaseCard" style="display:none">
+  <h2>📥 ثبت خرید جدید (افزودن لات)</h2>
+  <p class="notice" style="margin:0 0 8px">هر خرید یک لات جداگانه است تا سود دقیق با FIFO محاسبه شود.</p>
+  <form id="buyForm">
+    <input type="hidden" id="buyPid">
+    <div><label>نام کالا</label><input id="buyProductName" disabled></div>
+    <div class="fields">
+      <div><label>تعداد</label><input id="buyQty" type="number" min="1" step="1" inputmode="numeric" required></div>
+      <div><label>قیمت خرید واحد</label><input id="buyPrice" type="number" min="0" step="any" inputmode="decimal" required></div>
+    </div>
+    <div><label>تاریخ خرید (شمسی)</label><div id="buyDateWrap"></div></div>
+    <button class="primary">ثبت خرید و افزودن لات</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>فهرست کالاها</h2>
+  <div class="search-box"><input id="prodSearch" placeholder="جست‌وجو در کالاها..." oninput="renderProducts()"></div>
+  <div class="list-scroll" id="productsList"></div>
+</div>
+</section>
+
+<section id="sell" class="panel">
+<div class="card">
+  <div class="edit-banner" id="editBanner">
+    <b>✏️ حالت ویرایش فاکتور باز</b>
+    <span id="editBannerText">در حال ویرایش فاکتور مشتری...</span>
+  </div>
+  <h2 id="sellTitle">فاکتور فروش</h2>
+  <form id="sForm">
+    <input type="hidden" id="saleEditId">
+    <div><label>نام مشتری (یکتا)</label><input id="customer" required placeholder="نام مشتری جدید" autocomplete="off"><div class="discount-hint" id="customerHint"></div></div>
+    <div>
+      <label>تاریخ فاکتور (شمسی)</label>
+      <div id="invoiceDateWrap"></div>
+      <div class="discount-hint">قیمت‌های فعال در این تاریخ خودکار انتخاب می‌شوند.</div>
+    </div>
+    <div>
+      <label>محصولات فاکتور</label>
+      <div id="saleLines"></div>
+      <button type="button" class="secondary" id="addLine">＋ افزودن محصول دیگر</button>
+    </div>
+    <div class="discount-row">
+      <div><label>تخفیف (مبلغ)</label><input id="discountAmount" type="number" min="0" step="any" inputmode="decimal" value="0" oninput="calcTotal()"></div>
+      <div><label>تخفیف (درصد)</label><input id="discountPercent" type="number" min="0" max="100" step="any" inputmode="decimal" value="0" oninput="calcTotal()"></div>
+    </div>
+    <div class="sub">
+      جمع اقلام: <strong id="subTotal">۰</strong> ·
+      تخفیف: <strong id="discountValue">۰</strong> ·
+      قابل پرداخت: <strong class="total" id="invoiceTotal">۰</strong>
+    </div>
+    <div class="sub" style="background:var(--brand-soft);padding:7px 10px;border-radius:8px;color:var(--profit)">
+      💰 سود دقیق (FIFO): <strong id="invoiceProfit">۰</strong>
+    </div>
+    <div>
+      <label>وضعیت تسویه</label>
+      <select id="payStatus">
+        <option value="open">🔓 باز (تسویه نشده)</option>
+        <option value="closed">✅ بسته (تسویه شده)</option>
+      </select>
+    </div>
+    <button class="primary" id="sellSubmitBtn">ثبت فاکتور و کسر موجودی</button>
+    <button class="secondary" type="button" id="editCancelBtn" hidden>لغو ویرایش</button>
+  </form>
+</div>
+<p class="notice">هر مشتری فقط یک فاکتور باز می‌تواند داشته باشد. سود بر اساس لات‌های خرید (FIFO) محاسبه می‌شود.</p>
+</section>
+
+<section id="history" class="panel">
+<div class="card">
+  <h2>فاکتورها / فروش مشتریان</h2>
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">همه</button>
+    <button class="filter-btn" data-filter="open" onclick="setFilter('open')">🔓 باز</button>
+    <button class="filter-btn" data-filter="closed" onclick="setFilter('closed')">✅ بسته</button>
+  </div>
+  <div class="search-box"><input id="histSearch" placeholder="جست‌وجو بر اساس مشتری یا محصول..." oninput="renderHistory()"></div>
+  <div class="list-scroll" id="historyList"></div>
+</div>
+</section>
+
+<section id="stats" class="panel">
+<div class="card">
+  <h2>📊 آمار کلی</h2>
+  <div class="stat-block">
+    <h3>موجودی و ارزش</h3>
+    <div class="stat-row"><span class="label">تعداد کالاها</span><span class="value" id="statProdCount">۰</span></div>
+    <div class="stat-row"><span class="label">ارزش موجودی (FIFO)</span><span class="value" id="statStockValue">۰</span></div>
+    <div class="stat-row"><span class="label">تعداد لات‌های فعال</span><span class="value" id="statActiveLots">۰</span></div>
+  </div>
+
+  <div class="stat-block">
+    <h3>فروش و سود</h3>
+    <div class="stat-row"><span class="label">تعداد فاکتورها</span><span class="value" id="statSalesCount">۰</span></div>
+    <div class="stat-row"><span class="label">کل فروش</span><span class="value" id="statSalesTotal">۰</span></div>
+    <div class="stat-row"><span class="label">کل تخفیف‌ها</span><span class="value" id="statDiscounts">۰</span></div>
+    <div class="stat-row profit"><span class="label">سود کل (FIFO)</span><span class="value" id="statTotalProfit">۰</span></div>
+  </div>
+
+  <div class="stat-block">
+    <h3>وضعیت تسویه</h3>
+    <div class="stat-row"><span class="label">فاکتورهای باز (تعداد)</span><span class="value" id="statOpenCount">۰</span></div>
+    <div class="stat-row"><span class="label">مبلغ بدهی باز</span><span class="value" id="statOpenAmount">۰</span></div>
+    <div class="stat-row"><span class="label">فاکتورهای بسته (تعداد)</span><span class="value" id="statClosedCount">۰</span></div>
+    <div class="stat-row"><span class="label">مبلغ تسویه‌شده</span><span class="value" id="statClosedAmount">۰</span></div>
+  </div>
+
+  <div class="stat-block">
+    <h3>پرفروش‌ترین کالاها</h3>
+    <div id="statTopProducts"><div class="empty">داده‌ای موجود نیست</div></div>
+  </div>
+</div>
+</section>
+
+<section id="settings" class="panel">
+<div class="card">
+  <h2>🎨 تم رنگی</h2>
+  <div class="theme-picker" id="themePicker">
+    <button class="theme-swatch active" data-theme="teal" title="سبز" style="background:#0f766e">🌿</button>
+    <button class="theme-swatch" data-theme="blue" title="آبی" style="background:#1d4ed8">💙</button>
+    <button class="theme-swatch" data-theme="purple" title="بنفش" style="background:#7c3aed">💜</button>
+    <button class="theme-swatch" data-theme="orange" title="نارنجی" style="background:#ea580c">🧡</button>
+    <button class="theme-swatch" data-theme="pink" title="صورتی" style="background:#db2777">💗</button>
+    <button class="theme-swatch" data-theme="dark" title="تاریک" style="background:#1e293b">🌙</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📊 پشتیبان اکسل (CSV)</h2>
+  <p class="notice">خروجی شامل کالاها، لات‌ها و فاکتورهاست. تاریخ‌ها در فایل به‌صورت میلادی هستند تا با اکسل سازگار باشند.</p>
+  <button class="primary" id="exportBtn">دانلود خروجی CSV</button>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <label>انتخاب فایل پشتیبان CSV</label>
+  <input id="importFile" type="file" accept=".csv,text/csv">
+  <p class="notice">قبل از بازیابی، یک خروجی از اطلاعات فعلی بگیرید.</p>
+</div>
+
+<div class="card">
+  <h2>📱 نصب روی صفحه‌ی هوم</h2>
+  <div class="actions" style="justify-content:flex-start">
+    <button class="secondary" onclick="tryInstall()">نصب خودکار</button>
+    <button class="secondary" onclick="showInstallBanner()">راهنمای نصب</button>
+  </div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <h2>وضعیت PWA</h2>
+  <div id="pwaStatus" class="pwa-status">در حال بررسی...</div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <h2>درباره</h2>
+  <p class="notice"><b>مدیریت کالا، مشتری و فروش</b> — <span id="aboutVersion">نسخه ۲.۲</span><br>اطلاعات در حافظه‌ی مرورگر همین دستگاه ذخیره می‌شود.</p>
+</div>
+</section>
+
+<p class="notice" style="text-align:center;margin-top:14px">اطلاعات در حافظه مرورگر همین دستگاه ذخیره می‌شود.</p>
+</main>
+
+<nav class="bottom-nav">
+  <button class="bnav-btn active" data-tab="products"><span class="icon">📦</span><span>کالاها</span></button>
+  <button class="bnav-btn" data-tab="sell"><span class="icon">🧾</span><span>فروش</span></button>
+  <button class="bnav-btn" data-tab="history"><span class="icon">👥</span><span>فاکتورها</span></button>
+  <button class="bnav-btn" data-tab="stats"><span class="icon">📊</span><span>آمار</span></button>
+  <button class="bnav-btn" data-tab="settings"><span class="icon">⚙️</span><span>تنظیمات</span></button>
+</nav>
+
+<div class="install-banner" id="installBanner">
+  <div class="install-banner-content">
+    <div class="install-banner-icon">🏪</div>
+    <div class="install-banner-text">
+      <strong>این برنامه رو نصب کن</strong>
+      <small id="installBannerText">برای دسترسی سریع، به صفحه‌ی هوم اضافه کن</small>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="primary" onclick="tryInstall()" id="installBtn">نصب</button>
+    <button class="secondary" onclick="dismissInstall()">بعداً</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   نسخه
+   ============================================================ */
+const APP_VERSION = "۲.۲";
+
+/* ============================================================
+   ⭐ تاریخ شمسی — تبدیل‌گر
+   ============================================================ */
+const JALALI = (() => {
+  // تبدیل میلادی ↔ شمسی
+  function div(a, b){ return ~~(a / b); }
+  function mod(a, b){ return a - ~~(a / b) * b; }
+
+  function g2j(gy, gm, gd){
+    const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let jy = (gy <= 1600) ? 0 : 979;
+    gy -= (gy <= 1600) ? 621 : 1600;
+    const gy2 = (gm > 2) ? (gy + 1) : gy;
+    let days = (365 * gy) + div((gy2 + 3), 4) - div((gy2 + 99), 100) + div((gy2 + 399), 400) - 80 + gd + g_d_m[gm - 1];
+    jy += 33 * div(days, 12053);
+    days = mod(days, 12053);
+    jy += 4 * div(days, 1461);
+    days = mod(days, 1461);
+    jy += div((days - 1), 365);
+    if(days > 365) days = mod((days - 1), 365) + 1;
+    const jm = (days < 186) ? 1 + div(days, 31) : 7 + div((days - 186), 30);
+    const jd = 1 + ((days < 186) ? mod(days, 31) : mod((days - 186), 30));
+    return [jy, jm, jd];
+  }
+
+  function j2g(jy, jm, jd){
+    let gy = (jy <= 979) ? 621 : 1600;
+    jy -= (jy <= 979) ? 0 : 979;
+    const days = (365 * jy) + (div(jy, 33) * 8) + div((mod(jy, 33) + 3), 4) + 78 + jd + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
+    gy += 400 * div(days, 146097);
+    let d = mod(days, 146097);
+    if(d >= 36525){
+      d--;
+      gy += 100 * div(d, 36524);
+      d = mod(d, 36524);
+      if(d >= 365) d++;
+    }
+    gy += 4 * div(d, 1461);
+    d = mod(d, 1461);
+    if(d >= 366){
+      d--;
+      gy += div(d, 365);
+      d = mod(d, 365);
+    }
+    let gd = d + 1;
+    const sal_a = [0, 31, (isLeapG(gy) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let gm;
+    for(gm = 0; gm < 13; gm++){
+      const v = sal_a[gm];
+      if(gd <= v) break;
+      gd -= v;
+    }
+    return [gy, gm, gd];
+  }
+
+  function isLeapG(gy){
+    return (gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0);
+  }
+
+  function isLeapJ(jy){
+    return mod(((jy - (jy > 0 ? 474 : 473)) % 2820) + 474 + 38, 2820) * 682 % 2816 < 682;
+  }
+
+  function jMonthDays(jy, jm){
+    if(jm <= 6) return 31;
+    if(jm <= 11) return 30;
+    return isLeapJ(jy) ? 30 : 29;
+  }
+
+  const MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+  const DAYS = ['ش','ی','د','س','چ','پ','ج'];
+
+  // API
+  return {
+    // میلادی [gy,gm,gd] → شمسی [jy,jm,jd]
+    g2j,
+    // شمسی [jy,jm,jd] → میلادی [gy,gm,gd]
+    j2g,
+    isLeapJ, jMonthDays, MONTHS, DAYS,
+    // ISO 'YYYY-MM-DD' → 'YYYY/MM/DD' شمسی
+    isoToJalali(iso){
+      if(!iso) return '';
+      const m = String(iso).slice(0,10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if(!m) return '';
+      const [jy, jm, jd] = g2j(+m[1], +m[2], +m[3]);
+      return jy + '/' + String(jm).padStart(2,'0') + '/' + String(jd).padStart(2,'0');
+    },
+    // 'YYYY/MM/DD' شمسی → ISO 'YYYY-MM-DD' میلادی
+    jalaliToIso(jStr){
+      if(!jStr) return '';
+      const parts = String(jStr).replace(/[.\-]/g,'/').split('/').map(Number);
+      if(parts.length !== 3 || parts.some(isNaN)) return '';
+      let [jy, jm, jd] = parts;
+      if(jy < 100) jy += 1300;
+      const [gy, gm, gd] = j2g(jy, jm, jd);
+      return gy + '-' + String(gm).padStart(2,'0') + '-' + String(gd).padStart(2,'0');
+    },
+    // نمایش کامل شمسی
+    formatFull(iso){
+      if(!iso) return '—';
+      const m = String(iso).slice(0,10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if(!m) return iso;
+      const [jy, jm, jd] = g2j(+m[1], +m[2], +m[3]);
+      return jd + ' ' + MONTHS[jm-1] + ' ' + jy;
+    },
+    formatShort(iso){
+      if(!iso) return '—';
+      return this.isoToJalali(iso);
+    }
+  };
+})();
+
+/* ============================================================
+   کامپوننت ورودی تاریخ شمسی
+   ============================================================ */
+class JalaliDateInput {
+  constructor(container, opts = {}){
+    this.container = typeof container === 'string' ? document.getElementById(container) : container;
+    this.value = opts.value || ''; // ISO میلادی
+    this.onChange = opts.onChange || null;
+    this.viewYear = 0; this.viewMonth = 0; // شمسی
+    this.render();
+  }
+  setValue(iso){
+    this.value = iso || '';
+    this.syncInput();
+    this.closePicker();
+    if(this.onChange) this.onChange(this.value);
+  }
+  getValue(){ return this.value; }
+  syncInput(){
+    if(!this.input) return;
+    this.input.value = this.value ? JALALI.isoToJalali(this.value) : '';
+  }
+  render(){
+    this.container.innerHTML = `
+      <div class="jp-date">
+        <input type="text" class="jp-input" placeholder="۱۴۰۴/۰۲/۱۲" inputmode="numeric" autocomplete="off">
+        <button type="button" class="jp-cal-btn" aria-label="انتخاب تاریخ">📅</button>
+      </div>
+      <div class="jp-picker">
+        <div class="jp-picker-head">
+          <button type="button" data-nav="-1">‹</button>
+          <div class="jp-picker-title"></div>
+          <button type="button" data-nav="1">›</button>
+        </div>
+        <div class="jp-picker-grid"></div>
+        <div class="jp-picker-foot">
+          <button type="button" data-act="today">امروز</button>
+          <button type="button" data-act="clear">پاک کردن</button>
+        </div>
+      </div>
+    `;
+    this.input = this.container.querySelector('.jp-input');
+    this.picker = this.container.querySelector('.jp-picker');
+    this.title = this.container.querySelector('.jp-picker-title');
+    this.grid = this.container.querySelector('.jp-picker-grid');
+    this.syncInput();
+
+    // تعامل
+    this.input.addEventListener('focus', ()=> this.openPicker());
+    this.input.addEventListener('click', ()=> this.openPicker());
+    this.input.addEventListener('blur', ()=> setTimeout(()=> this.parseTyped(), 100));
+    this.input.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ this.parseTyped(); this.closePicker(); e.preventDefault(); }
+      if(e.key === 'Escape'){ this.closePicker(); }
+    });
+    this.container.querySelector('.jp-cal-btn').onclick = (e)=>{ e.preventDefault(); this.togglePicker(); };
+    this.container.querySelectorAll('[data-nav]').forEach(b => {
+      b.onclick = (e)=>{
+        e.preventDefault();
+        const dir = Number(b.dataset.nav);
+        this.viewMonth += dir;
+        if(this.viewMonth > 12){ this.viewMonth = 1; this.viewYear++; }
+        if(this.viewMonth < 1){ this.viewMonth = 12; this.viewYear--; }
+        this.renderGrid();
+      };
+    });
+    this.container.querySelectorAll('[data-act]').forEach(b => {
+      b.onclick = (e)=>{
+        e.preventDefault();
+        if(b.dataset.act === 'today'){
+          const now = new Date();
+          const iso = now.toISOString().slice(0,10);
+          this.setValue(iso);
+        }else{
+          this.setValue('');
+        }
+      };
+    });
+
+    // بستن با کلیک بیرون
+    this.outsideHandler = (e)=>{
+      if(!this.container.contains(e.target)) this.closePicker();
+    };
+
+    // مقدار اولیه
+    if(this.value){
+      const m = this.value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if(m){
+        const [jy, jm] = JALALI.g2j(+m[1], +m[2], +m[3]);
+        this.viewYear = jy; this.viewMonth = jm;
+      }
+    }
+  }
+  togglePicker(){
+    if(this.picker.classList.contains('show')) this.closePicker();
+    else this.openPicker();
+  }
+  openPicker(){
+    const now = new Date();
+    const iso = this.value || now.toISOString().slice(0,10);
+    const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m){
+      const [jy, jm] = JALALI.g2j(+m[1], +m[2], +m[3]);
+      this.viewYear = jy; this.viewMonth = jm;
+    }else{
+      const [jy, jm] = JALALI.g2j(now.getFullYear(), now.getMonth()+1, now.getDate());
+      this.viewYear = jy; this.viewMonth = jm;
+    }
+    this.renderGrid();
+    this.picker.classList.add('show');
+    document.addEventListener('click', this.outsideHandler, true);
+  }
+  closePicker(){
+    this.picker.classList.remove('show');
+    document.removeEventListener('click', this.outsideHandler, true);
+  }
+  renderGrid(){
+    this.title.textContent = JALALI.MONTHS[this.viewMonth-1] + ' ' + this.viewYear;
+
+    const days = JALALI.jMonthDays(this.viewYear, this.viewMonth);
+    // روز اول ماه شمسی در هفته (شنبه = 0)
+    const [gy, gm, gd] = JALALI.j2g(this.viewYear, this.viewMonth, 1);
+    const dt = new Date(gy, gm-1, gd);
+    const jsDay = dt.getDay(); // 0=Sun..6=Sat
+    // تبدیل به شنبه‌اول
+    let startCol = (jsDay + 1) % 7; // 0=Sat
+
+    const now = new Date();
+    const todayISO = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    const selIso = this.value;
+
+    let html = '';
+    // نام روزها
+    JALALI.DAYS.forEach(d => html += `<div class="jp-picker-dayname">${d}</div>`);
+    // روزهای ماه قبل
+    const prevMonthDays = (this.viewMonth === 1) ? JALALI.jMonthDays(this.viewYear-1, 12) : JALALI.jMonthDays(this.viewYear, this.viewMonth-1);
+    for(let i = 0; i < startCol; i++){
+      html += `<button type="button" class="jp-picker-cell out" disabled>${prevMonthDays - startCol + i + 1}</button>`;
+    }
+    // روزهای ماه
+    for(let d = 1; d <= days; d++){
+      const [ggy, ggm, ggd] = JALALI.j2g(this.viewYear, this.viewMonth, d);
+      const iso = ggy + '-' + String(ggm).padStart(2,'0') + '-' + String(ggd).padStart(2,'0');
+      const cls = ['jp-picker-cell'];
+      if(iso === todayISO) cls.push('today');
+      if(iso === selIso) cls.push('selected');
+      html += `<button type="button" class="${cls.join(' ')}" data-iso="${iso}">${d}</button>`;
+    }
+    // تکمیل 6 هفته
+    const total = startCol + days;
+    const remain = (7 - (total % 7)) % 7;
+    for(let i = 1; i <= remain; i++){
+      html += `<button type="button" class="jp-picker-cell out" disabled>${i}</button>`;
+    }
+
+    this.grid.innerHTML = html;
+    this.grid.querySelectorAll('[data-iso]').forEach(b => {
+      b.onclick = (e)=>{
+        e.preventDefault();
+        this.setValue(b.dataset.iso);
+      };
+    });
+  }
+  parseTyped(){
+    const raw = this.input.value.trim();
+    if(!raw){ this.setValue(''); return; }
+    // پشتیبانی از ۱۴۰۴/۰۲/۱۲ و ۱۴۰۴-۲-۱۲ و 1404.2.12
+    const norm = raw.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[.\-]/g, '/');
+    const iso = JALALI.jalaliToIso(norm);
+    if(iso){
+      // اعتبارسنجی
+      const m = norm.split('/').map(Number);
+      if(m.length === 3){
+        const days = JALALI.jMonthDays(m[0] < 100 ? m[0]+1300 : m[0], m[1]);
+        if(m[2] < 1 || m[2] > days){ this.syncInput(); return; }
+      }
+      this.setValue(iso);
+    }else{
+      this.syncInput();
+    }
+  }
+}
+
+/* ============================================================
+   Manifest
+   ============================================================ */
+(function injectManifest(){
+  const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0f766e"/><text x="256" y="360" font-size="300" text-anchor="middle" font-family="Arial">🏪</text></svg>`;
+  const iconUrl = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(iconSvg)));
+  const manifest = {
+    name: "مدیریت کالا، مشتری و فروش", short_name: "مدیریت فروش",
+    description: "مدیریت کالا، مشتری و فاکتور فروش با FIFO",
+    start_url: ".", scope: ".", display: "standalone", orientation: "portrait",
+    background_color: "#f4f7f8", theme_color: "#0f766e", dir: "rtl", lang: "fa",
+    icons: [
+      { src: iconUrl, sizes: "192x192", type: "image/svg+xml", purpose: "any" },
+      { src: iconUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type: "application/manifest+json"});
+  const link = document.createElement("link");
+  link.rel = "manifest"; link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+})();
+
+/* ============================================================
+   Service Worker
+   ============================================================ */
+(function registerSW(){
+  if(!("serviceWorker" in navigator)) return;
+  if(location.protocol !== "https:" && location.hostname !== "localhost") return;
+  const swCode = `
+    self.addEventListener('install', e => { self.skipWaiting(); });
+    self.addEventListener('activate', e => { e.waitUntil(self.clients.claim()); });
+    self.addEventListener('fetch', e => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+  `;
+  const blob = new Blob([swCode], {type: "text/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err=>console.warn("SW:", err));
+})();
+
+/* ============================================================
+   PWA Install
+   ============================================================ */
+let deferredPrompt = null;
+const INSTALL_DISMISS_KEY = "inventory_install_dismissed";
+window.addEventListener("beforeinstallprompt", (e)=>{
+  e.preventDefault(); deferredPrompt = e;
+  el("pwaStatus").textContent = "✅ آماده‌ی نصب";
+  el("pwaStatus").className = "pwa-status";
+  if(!localStorage.getItem(INSTALL_DISMISS_KEY)) showInstallBanner();
+});
+window.addEventListener("appinstalled", ()=>{
+  toast("✅ نصب شد!"); dismissInstall(); deferredPrompt = null;
+  el("pwaStatus").textContent = "✅ نصب شده";
+});
+function showInstallBanner(){
+  el("installBanner").classList.add("show");
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if(isIOS && !deferredPrompt){
+    el("installBannerText").textContent = "در Safari: Share ← Add to Home Screen";
+    el("installBtn").style.display = "none";
+  }else if(!deferredPrompt){
+    el("installBannerText").textContent = "از منوی مرورگر → Install app";
+    el("installBtn").style.display = "none";
+  }else{
+    el("installBtn").style.display = "";
+  }
+}
+function dismissInstall(){
+  el("installBanner").classList.remove("show");
+  try{ localStorage.setItem(INSTALL_DISMISS_KEY, "1"); }catch(e){}
+}
+async function tryInstall(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    toast(outcome === "accepted" ? "✅ نصب شد" : "نصب لغو شد");
+    deferredPrompt = null; dismissInstall();
+  }else{
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if(isIOS) alert("در Safari:\n۱. Share\n۲. Add to Home Screen\n۳. Add");
+    else if(location.protocol !== "https:" && location.hostname !== "localhost")
+      alert("⚠️ برای نصب، صفحه باید از HTTPS باز شود.");
+    else alert("از منوی مرورگر (سه نقطه) → Install app");
+  }
+}
+
+/* ============================================================
+   داده
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const KEY = 'inventory_fifo_v2';
+const THEME_KEY = 'inventory_theme_v1';
+let db = { products:[], sales:[] };
+let currentFilter = 'all';
+
+const fmt = n => Number(n||0).toLocaleString('fa-IR',{maximumFractionDigits:2});
+const money = fmt;
+const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function el(id){ return document.getElementById(id); }
+function toast(msg, ms){
+  const t = el("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>t.classList.remove("show"), ms||2200);
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(db)); renderAll(); }
+const todayISO = () => {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+};
+
+/* ============================================================
+   توابع قیمت زمان‌دار
+   ============================================================ */
+function priceAt(prices, dateStr){
+  if(!prices || !prices.length) return 0;
+  const sorted = [...prices].sort((a,b)=> a.from < b.from ? -1 : a.from > b.from ? 1 : 0);
+  let active = 0;
+  for(const p of sorted){
+    if(p.from <= dateStr) active = p.price; else break;
+  }
+  if(active === 0 && sorted.length) active = sorted[0].price;
+  return active;
+}
+
+/* ============================================================
+   FIFO
+   ============================================================ */
+function totalQty(p){ return p.lots.reduce((a,l)=>a + Math.max(0, l.qty), 0); }
+function stockValue(p){ return p.lots.reduce((a,l)=> a + (l.qty > 0 ? l.qty * l.buy : 0), 0); }
+
+function fifoCost(p, qty){
+  const lots = [...p.lots].filter(l=>l.qty>0).sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  let remaining = qty; let totalCost = 0; const breakdown = [];
+  for(const lot of lots){
+    if(remaining <= 0) break;
+    const take = Math.min(lot.qty, remaining);
+    totalCost += take * lot.buy;
+    breakdown.push({lotId: lot.id, qty: take, buy: lot.buy, cost: take * lot.buy, date: lot.date});
+    remaining -= take;
+  }
+  return { cost: totalCost, breakdown, shortage: remaining };
+}
+function fifoDeduct(p, qty, saleId){
+  const lots = [...p.lots].filter(l=>l.qty>0).sort((a,b)=> a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  let remaining = qty; const used = [];
+  for(const lot of lots){
+    if(remaining <= 0) break;
+    const take = Math.min(lot.qty, remaining);
+    lot.qty -= take; remaining -= take;
+    used.push({lotId: lot.id, qty: take, buy: lot.buy, date: lot.date, saleId});
+  }
+  return used;
+}
+function fifoRestore(p, deductions){
+  for(const d of deductions){
+    const lot = p.lots.find(l => l.id === d.lotId);
+    if(lot) lot.qty += d.qty;
+  }
+}
+
+/* ============================================================
+   مهاجرت
+   ============================================================ */
+function migrate(){
+  if(!Array.isArray(db.products)) db.products = [];
+  if(!Array.isArray(db.sales)) db.sales = [];
+  db.products.forEach(p => {
+    if(!Array.isArray(p.lots)){
+      p.lots = [];
+      const qty = Number(p.qty) || 0;
+      if(qty > 0){
+        const buy = (typeof p.buy === 'number' && p.buy > 0) ? p.buy
+                  : (Array.isArray(p.buyPrices) ? priceAt(p.buyPrices, todayISO()) : 0);
+        p.lots.push({ id: uid(), date: '1970-01-01', qty, buy });
+      }
+    }
+    if(!Array.isArray(p.buyPrices)){
+      const v = (typeof p.buy === 'number') ? p.buy : 0;
+      p.buyPrices = [{from: '1970-01-01', price: v}];
+    }
+    if(!Array.isArray(p.sellPrices)){
+      const v = (typeof p.price === 'number') ? p.price : 0;
+      p.sellPrices = [{from: '1970-01-01', price: v}];
+    }
+    delete p.qty; delete p.buy; delete p.price; delete p.avgBuy;
+  });
+  db.sales.forEach(s => {
+    if(typeof s.discountAmount !== 'number') s.discountAmount = 0;
+    if(typeof s.discountPercent !== 'number') s.discountPercent = 0;
+    if(typeof s.payStatus !== 'string') s.payStatus = 'closed';
+    if(typeof s.delivered !== 'boolean') s.delivered = false;
+    if(typeof s.subTotal !== 'number') s.subTotal = s.items.reduce((a,i)=>a+i.total,0);
+    if(!s.date) s.date = new Date().toISOString();
+    s.items.forEach(i => {
+      if(typeof i.buy !== 'number'){
+        const p = db.products.find(pp=>pp.id === i.pid);
+        i.buy = p ? (p.lots[0]?.buy || 0) : 0;
+      }
+      if(!Array.isArray(i.deductions)) i.deductions = [];
+      if(typeof i.cost !== 'number') i.cost = (i.buy||0) * i.qty;
+    });
+  });
+}
+
+function load(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(KEY));
+    if(raw && Array.isArray(raw.products) && Array.isArray(raw.sales)) db = raw;
+  }catch(e){}
+  migrate();
+  loadTheme();
+}
+function pget(id){ return db.products.find(p=>p.id===id); }
+function sget(id){ return db.sales.find(s=>s.id===id); }
+function findOpenSaleByCustomer(name, exceptId){
+  if(!name) return null;
+  return db.sales.find(s => s.payStatus === 'open' && (s.customer||'').trim() === name && s.id !== exceptId);
+}
+function saleProfit(s){
+  const revenue = s.items.reduce((a,i)=> a + (i.price * i.qty), 0);
+  const cost = s.items.reduce((a,i)=> a + (i.cost || 0), 0);
+  return revenue - cost - (s.discountAmount||0);
+}
+
+/* ============================================================
+   تم رنگی
+   ============================================================ */
+function loadTheme(){
+  const t = localStorage.getItem(THEME_KEY) || 'teal';
+  applyTheme(t);
+}
+function applyTheme(name){
+  if(name === 'teal') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', name);
+  document.querySelectorAll('.theme-swatch').forEach(s => {
+    s.classList.toggle('active', s.dataset.theme === name);
+  });
+  localStorage.setItem(THEME_KEY, name);
+  const colors = {teal:'#0f766e', blue:'#1d4ed8', purple:'#7c3aed', orange:'#ea580c', pink:'#db2777', dark:'#0f172a'};
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', colors[name] || '#0f766e');
+}
+document.querySelectorAll('.theme-swatch').forEach(s => {
+  s.onclick = () => applyTheme(s.dataset.theme);
+});
+
+/* ============================================================
+   ناوبری
+   ============================================================ */
+document.querySelectorAll('.bnav-btn').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.bnav-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  $(b.dataset.tab).classList.add('active');
+  window.scrollTo({top:0});
+  if(b.dataset.tab === 'stats') renderStats();
+});
+window.setFilter = function(f){
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === f));
+  renderHistory();
+};
+
+/* ============================================================
+   ردیف‌های قیمت (با JalaliDateInput)
+   ============================================================ */
+function priceRowsHTML(prices){
+  if(!prices.length) prices = [{from: todayISO(), price:0}];
+  return prices.map(p => `
+    <div class="price-item" data-iso="${esc(p.from)}">
+      <div class="jp-slot"></div>
+      <input type="number" min="0" step="any" inputmode="decimal" value="${p.price}" class="price-value">
+      <button type="button" class="del-price" onclick="removePriceRow(this)">×</button>
+    </div>`).join('');
+}
+
+function mountPriceDatePickers(){
+  document.querySelectorAll('#pBuyPrices .price-item, #pSellPrices .price-item').forEach(row => {
+    const slot = row.querySelector('.jp-slot');
+    if(!slot || slot.dataset.mounted) return;
+    slot.dataset.mounted = '1';
+    slot.innerHTML = '';
+    new JalaliDateInput(slot, {value: row.dataset.iso || todayISO(), onChange: ()=>{}});
+  });
+}
+
+function collectPrices(containerId){
+  const rows = document.querySelectorAll('#'+containerId+' .price-item');
+  const out = [];
+  rows.forEach(r => {
+    const slot = r.querySelector('.jp-slot');
+    const dateInp = slot?.querySelector('.jp-input');
+    let iso = '';
+    // از instance داخلی استفاده می‌کنیم
+    if(dateInp && dateInp._jpInstance) iso = dateInp._jpInstance.getValue();
+    else if(dateInp) iso = JALALI.jalaliToIso(dateInp.value);
+    const price = Number(r.querySelector('.price-value').value) || 0;
+    if(iso) out.push({from: iso, price});
+  });
+  return out;
+}
+
+window.addPriceRow = function(type, containerId){
+  const html = `
+    <div class="price-item" data-iso="${todayISO()}">
+      <div class="jp-slot"></div>
+      <input type="number" min="0" step="any" inputmode="decimal" value="0" class="price-value">
+      <button type="button" class="del-price" onclick="removePriceRow(this)">×</button>
+    </div>`;
+  document.getElementById(containerId).insertAdjacentHTML('beforeend', html);
+  mountPriceDatePickers();
+  updateMarginHint();
+};
+
+window.removePriceRow = function(btn){
+  const list = btn.closest('.price-list');
+  if(list.querySelectorAll('.price-item').length <= 1){
+    alert('حداقل یک بازه قیمتی لازم است');
+    return;
+  }
+  btn.closest('.price-item').remove();
+  updateMarginHint();
+};
+
+function updateMarginHint(){
+  const buyPrices = collectPrices('pBuyPrices');
+  const sellPrices = collectPrices('pSellPrices');
+  const today = todayISO();
+  const buy = priceAt(buyPrices, today);
+  const sell = priceAt(sellPrices, today);
+  const hint = $('pMarginHint');
+  if(!buy || !sell){ hint.textContent = ''; return; }
+  const margin = sell - buy;
+  const pct = buy > 0 ? margin/buy*100 : 0;
+  if(margin < 0){
+    hint.textContent = `⚠️ قیمت فروش جاری از خرید کمتر است. زیان هر واحد: ${money(-margin)}`;
+    hint.style.color = 'var(--danger)';
+  }else{
+    hint.textContent = `✅ خرید: ${money(buy)} · فروش: ${money(sell)} · حاشیه: ${money(margin)} (${fmt(pct)}٪)`;
+    hint.style.color = 'var(--ok)';
+  }
+}
+
+function renderPriceEditor(buyPrices, sellPrices){
+  $('pBuyPrices').innerHTML = priceRowsHTML(buyPrices);
+  $('pSellPrices').innerHTML = priceRowsHTML(sellPrices);
+  mountPriceDatePickers();
+  updateMarginHint();
+}
+
+/* ============================================================
+   فرم کالا
+   ============================================================ */
+$('pForm').onsubmit = e => {
+  e.preventDefault();
+  const name = $('pName').value.trim();
+  const buyPrices = collectPrices('pBuyPrices').sort((a,b)=> a.from < b.from ? -1 : 1);
+  const sellPrices = collectPrices('pSellPrices').sort((a,b)=> a.from < b.from ? -1 : 1);
+  const eid = $('pEdit').value;
+
+  if(!name){ alert('نام محصول لازم است'); return; }
+  if(!buyPrices.length || !sellPrices.length){ alert('حداقل یک قیمت خرید و یک قیمت فروش لازم است'); return; }
+
+  if(eid){
+    const p = pget(eid); if(!p) return;
+    p.name = name; p.buyPrices = buyPrices; p.sellPrices = sellPrices;
+  }else{
+    db.products.push({id: uid(), name, buyPrices, sellPrices, lots: []});
+  }
+  resetProductForm(); save();
+  toast(eid ? "✅ ویرایش شد" : "✅ کالا اضافه شد");
+};
+
+function resetProductForm(){
+  $('pForm').reset();
+  $('pEdit').value = '';
+  $('pTitle').textContent = 'ثبت کالا';
+  $('pCancel').hidden = true;
+  $('pMarginHint').textContent = '';
+  $('purchaseCard').style.display = 'none';
+  renderPriceEditor([{from: todayISO(), price:0}], [{from: todayISO(), price:0}]);
+}
+
+$('pCancel').onclick = resetProductForm;
+
+window.editP = id => {
+  const p = pget(id); if(!p) return;
+  $('pEdit').value = id;
+  $('pName').value = p.name;
+  renderPriceEditor(p.buyPrices, p.sellPrices);
+  $('pTitle').textContent = 'ویرایش کالا';
+  $('pCancel').hidden = false;
+
+  $('purchaseCard').style.display = 'block';
+  $('buyPid').value = p.id;
+  $('buyProductName').value = p.name;
+  $('buyQty').value = 1;
+  $('buyPrice').value = priceAt(p.buyPrices, todayISO());
+
+  // تاریخ خرید (شمسی)
+  if(!$('buyDateWrap')._jpInstance){
+    $('buyDateWrap')._jpInstance = new JalaliDateInput('buyDateWrap', {value: todayISO()});
+  }else{
+    $('buyDateWrap')._jpInstance.setValue(todayISO());
+  }
+
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+
+window.delP = id => {
+  if(db.sales.some(s => s.items.some(i => i.pid === id))){
+    alert('این کالا در فاکتور ثبت شده؛ ابتدا فاکتور را برگردانید.');
+    return;
+  }
+  if(confirm('کالا حذف شود؟')){
+    db.products = db.products.filter(p=>p.id!==id);
+    save(); toast("🗑 حذف شد");
+  }
+};
+
+$('buyForm').onsubmit = e => {
+  e.preventDefault();
+  const pid = $('buyPid').value;
+  const p = pget(pid); if(!p) return;
+  const qty = Number($('buyQty').value);
+  const price = Number($('buyPrice').value);
+  const iso = $('buyDateWrap')._jpInstance?.getValue() || todayISO();
+  if(!Number.isInteger(qty) || qty < 1){ alert('تعداد باید عدد صحیح مثبت باشد'); return; }
+  if(price < 0){ alert('قیمت نامعتبر'); return; }
+
+  p.lots.push({id: uid(), date: iso, qty, buy: price});
+  save(); toast("✅ لات خرید اضافه شد");
+  $('buyQty').value = 1;
+};
+
+/* ============================================================
+   فهرست کالاها
+   ============================================================ */
+function renderProducts(){
+  const q = ($('prodSearch')?.value || '').trim().toLowerCase();
+  const list = q ? db.products.filter(p=>p.name.toLowerCase().includes(q)) : db.products;
+  if(!list.length){
+    $('productsList').innerHTML = q
+      ? '<div class="empty">کالایی با این نام پیدا نشد.</div>'
+      : '<div class="empty">کالایی ثبت نشده است.</div>';
+    return;
+  }
+  const today = todayISO();
+  $('productsList').innerHTML = list.map(p => {
+    const buyNow = priceAt(p.buyPrices, today);
+    const sellNow = priceAt(p.sellPrices, today);
+    const qty = totalQty(p);
+    const margin = sellNow - buyNow;
+    const marginPct = buyNow > 0 ? (margin/buyNow*100) : 0;
+    const lots = p.lots.filter(l=>l.qty>0).sort((a,b)=> a.date < b.date ? -1 : 1);
+    return `
+    <div class="item">
+      <div style="flex:1;min-width:0">
+        <div class="name">${esc(p.name)}</div>
+        <div class="sub">خرید جاری: ${money(buyNow)} · فروش جاری: ${money(sellNow)} · موجودی: <b>${fmt(qty)}</b></div>
+        <div class="sub profit">حاشیه سود: ${money(margin)}${buyNow>0?` (${fmt(marginPct)}٪)`:''}</div>
+        <button class="price-history-btn" onclick="togglePriceHistory('${p.id}')">🕒 تاریخچه لات‌ها و قیمت‌ها</button>
+        <div class="price-history" id="ph-${p.id}">
+          <div style="font-weight:bold;margin-bottom:4px">لات‌های موجود (FIFO):</div>
+          ${lots.length ? lots.map(l => `
+            <div class="price-history-row">
+              <span><span class="badge lot">${JALALI.formatShort(l.date)}</span></span>
+              <span>${fmt(l.qty)} × ${money(l.buy)} = ${money(l.qty*l.buy)}</span>
+            </div>`).join('') : '<div class="price-history-row">— لات موجودی ندارد —</div>'}
+          <div style="font-weight:bold;margin:8px 0 4px">قیمت خرید زمان‌دار:</div>
+          ${[...p.buyPrices].sort((a,b)=>a.from<b.from?-1:1).map(x=>`<div class="price-history-row"><span>${JALALI.formatShort(x.from)}</span><span>${money(x.price)}</span></div>`).join('')}
+          <div style="font-weight:bold;margin:8px 0 4px">قیمت فروش زمان‌دار:</div>
+          ${[...p.sellPrices].sort((a,b)=>a.from<b.from?-1:1).map(x=>`<div class="price-history-row"><span>${JALALI.formatShort(x.from)}</span><span>${money(x.price)}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="actions">
+        <button class="secondary" onclick="editP('${p.id}')">ویرایش</button>
+        <button class="secondary danger" onclick="delP('${p.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.togglePriceHistory = id => {
+  const e = $('ph-'+id);
+  if(e) e.classList.toggle('show');
+};
+
+/* ============================================================
+   فاکتورها
+   ============================================================ */
+function invoiceShareText(s){
+  const lines = [
+    '🧾 فاکتور فروش',
+    'مشتری: ' + (s.customer || '—'),
+    'تاریخ: ' + JALALI.formatFull(s.date),
+    '--------------------',
+    ...s.items.map((i,n) => `${n+1}. ${i.name} | تعداد: ${fmt(i.qty)} | فی: ${money(i.price)} | مبلغ: ${money(i.qty*i.price)}`),
+    '--------------------',
+    'جمع اقلام: ' + money(s.subTotal ?? s.items.reduce((a,i)=>a+i.qty*i.price,0)),
+    'تخفیف: ' + money(s.discountAmount || 0),
+    'مبلغ قابل پرداخت: ' + money(s.total),
+    'وضعیت تسویه: ' + (s.payStatus === 'closed' ? 'تسویه شده' : 'تسویه نشده'),
+    'وضعیت تحویل: ' + (s.delivered ? 'تحویل داده شد' : 'تحویل نشده')
+  ];
+  return lines.join('\n');
+}
+window.copyInvoiceText = async id => {
+  const s = sget(id); if(!s) return;
+  const text = invoiceShareText(s);
+  try{
+    if(navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+    else {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand('copy'); ta.remove();
+      if(!ok) throw new Error('copy failed');
+    }
+    toast('📋 متن فاکتور کپی شد؛ آماده اشتراک‌گذاری است');
+  }catch(e){ toast('کپی خودکار انجام نشد؛ دوباره تلاش کنید'); }
+};
+window.toggleDelivered = id => {
+  const s = sget(id); if(!s) return;
+  s.delivered = !s.delivered;
+  save(); toast(s.delivered ? '📦 فاکتور تحویل داده شد' : 'فاکتور از حالت تحویل خارج شد');
+};
+
+function renderHistory(){
+  const q = ($('histSearch')?.value || '').trim().toLowerCase();
+  let list = [...db.sales].reverse();
+  if(currentFilter !== 'all') list = list.filter(s => s.payStatus === currentFilter);
+  if(q){
+    list = list.filter(s =>
+      (s.customer||'').toLowerCase().includes(q) ||
+      s.items.some(i => (i.name||'').toLowerCase().includes(q))
+    );
+  }
+  if(!list.length){
+    $('historyList').innerHTML = q
+      ? '<div class="empty">فاکتوری با این جست‌وجو پیدا نشد.</div>'
+      : '<div class="empty">فاکتوری ثبت نشده است.</div>';
+    return;
+  }
+  $('historyList').innerHTML = list.map(s => {
+    const isOpen = s.payStatus === 'open';
+    const badge = isOpen ? '<span class="badge open">🔓 باز</span>' : '<span class="badge closed">✅ بسته</span>';
+    const deliveredBadge = s.delivered
+      ? '<span class="badge closed">📦 تحویل داده شد</span>'
+      : '<span class="badge future">📦 تحویل نشده</span>';
+    const discLine = (s.discountAmount > 0)
+      ? `<div class="sub">تخفیف: ${money(s.discountAmount)}${s.discountPercent>0?` (${fmt(s.discountPercent)}٪)`:''}</div>`
+      : '';
+    const profitVal = saleProfit(s);
+    const editBtn = isOpen ? `<button class="secondary" onclick="editSale('${s.id}')">✏️ ویرایش</button>` : '';
+    return `
+    <div class="item">
+      <div style="flex:1;min-width:0">
+        <div class="name">${esc(s.customer)} ${badge} ${deliveredBadge}<span class="sub"> · ${JALALI.formatFull(s.date)}</span></div>
+        <div class="sub">${s.items.map(i => esc(i.name)+' × '+fmt(i.qty)+' ('+money(i.price)+')').join('<br>')}</div>
+        ${discLine}
+        <div class="total">جمع: ${money(s.total)}</div>
+        <div class="sub profit">سود دقیق (FIFO): ${money(profitVal)}</div>
+      </div>
+      <div class="actions" style="flex-direction:column;align-items:flex-end">
+        ${editBtn}
+        <button class="secondary" onclick="copyInvoiceText('${s.id}')">📋 کپی متن فاکتور</button>
+        <button class="secondary" onclick="toggleDelivered('${s.id}')">${s.delivered ? '↩️ لغو تحویل' : '📦 تحویل داده شد'}</button>
+        <button class="secondary" onclick="togglePayStatus('${s.id}')">${isOpen ? '✅ تسویه' : '🔓 باز کن'}</button>
+        <button class="secondary danger" onclick="undoS('${s.id}')">حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   آمار
+   ============================================================ */
+function renderStats(){
+  const totalProducts = db.products.length;
+  const totalStockValue = db.products.reduce((a,p)=> a + stockValue(p), 0);
+  const activeLots = db.products.reduce((a,p)=> a + p.lots.filter(l=>l.qty>0).length, 0);
+
+  const salesCount = db.sales.length;
+  const salesTotal = db.sales.reduce((a,s)=> a + s.total, 0);
+  const discountsTotal = db.sales.reduce((a,s)=> a + (s.discountAmount||0), 0);
+  const totalProfit = db.sales.reduce((a,s)=> a + saleProfit(s), 0);
+
+  const openSales = db.sales.filter(s => s.payStatus === 'open');
+  const closedSales = db.sales.filter(s => s.payStatus === 'closed');
+  const openAmount = openSales.reduce((a,s)=> a + s.total, 0);
+  const closedAmount = closedSales.reduce((a,s)=> a + s.total, 0);
+
+  $('statProdCount').textContent = fmt(totalProducts);
+  $('statStockValue').textContent = money(totalStockValue);
+  $('statActiveLots').textContent = fmt(activeLots);
+  $('statSalesCount').textContent = fmt(salesCount);
+  $('statSalesTotal').textContent = money(salesTotal);
+  $('statDiscounts').textContent = money(discountsTotal);
+  $('statTotalProfit').textContent = money(totalProfit);
+  $('statOpenCount').textContent = fmt(openSales.length);
+  $('statOpenAmount').textContent = money(openAmount);
+  $('statClosedCount').textContent = fmt(closedSales.length);
+  $('statClosedAmount').textContent = money(closedAmount);
+
+  const map = {};
+  db.sales.forEach(s => {
+    s.items.forEach(i => {
+      if(!map[i.pid]) map[i.pid] = {name: i.name, qty: 0, revenue: 0};
+      map[i.pid].qty += i.qty;
+      map[i.pid].revenue += i.qty * i.price;
+    });
+  });
+  const top = Object.values(map).sort((a,b)=> b.qty - a.qty).slice(0,5);
+  $('statTopProducts').innerHTML = top.length
+    ? top.map((t,i) => `
+      <div class="stat-row">
+        <span class="label">${i+1}. ${esc(t.name)}</span>
+        <span class="value">${fmt(t.qty)} عدد / ${money(t.revenue)}</span>
+      </div>`).join('')
+    : '<div class="empty">داده‌ای موجود نیست</div>';
+}
+
+/* ============================================================
+   ردیف فاکتور
+   ============================================================ */
+function addSaleLine(prefill){
+  const wrap = document.createElement('div');
+  wrap.className = 'line-row';
+  wrap.innerHTML = `
+    <div class="line-search">
+      <label>کالا</label>
+      <input class="lSearch" placeholder="تایپ کن..." autocomplete="off">
+      <input type="hidden" class="lProd">
+      <input type="hidden" class="lCost">
+      <input type="hidden" class="lAutoPrice">
+      <div class="line-results"></div>
+    </div>
+    <div><label>تعداد</label><input class="lQty" type="number" min="1" step="1" inputmode="numeric" value="1" required></div>
+    <div><label>قیمت واحد</label><input class="lPrice" type="number" min="0" step="any" inputmode="decimal" required></div>
+    <button type="button" class="remove-line" aria-label="حذف ردیف">×</button>`;
+  const searchInp = wrap.querySelector('.lSearch');
+  const hiddenProd = wrap.querySelector('.lProd');
+  const hiddenCost = wrap.querySelector('.lCost');
+  const hiddenAuto = wrap.querySelector('.lAutoPrice');
+  const results = wrap.querySelector('.line-results');
+  const priceInp = wrap.querySelector('.lPrice');
+  const qtyInp = wrap.querySelector('.lQty');
+
+  function showResults(){
+    const q = searchInp.value.trim().toLowerCase();
+    const matches = (q ? db.products.filter(p=>p.name.toLowerCase().includes(q)) : db.products).slice(0,15);
+    if(!matches.length){
+      results.innerHTML = '<div class="line-result" style="color:#758094;cursor:default">کالایی موجود نیست</div>';
+    }else{
+      const today = todayISO();
+      results.innerHTML = matches.map(p=>`
+        <div class="line-result" data-id="${p.id}" onmousedown="event.preventDefault()" onclick="pickLineProduct(this)">
+          <b>${esc(p.name)}</b>
+          <small>موجودی: ${fmt(totalQty(p))} · فروش جاری: ${money(priceAt(p.sellPrices, today))}</small>
+        </div>`).join('');
+    }
+    results.classList.add('show');
+  }
+
+  searchInp.addEventListener('input', showResults);
+  searchInp.addEventListener('focus', showResults);
+  searchInp.addEventListener('blur', ()=>setTimeout(()=>results.classList.remove('show'),150));
+
+  window.pickLineProduct = function(node){
+    const id = node.dataset.id;
+    const p = pget(id); if(!p) return;
+    const invIso = $('invoiceDateWrap')._jpInstance?.getValue() || todayISO();
+    const autoPrice = priceAt(p.sellPrices, invIso);
+    hiddenProd.value = id;
+    hiddenAuto.value = autoPrice;
+    searchInp.value = p.name;
+    priceInp.value = autoPrice;
+    results.classList.remove('show');
+    qtyInp.focus();
+    updateLineCost(wrap);
+    checkMargin(wrap);
+    calcTotal();
+  };
+
+  function checkMargin(row){
+    const cost = Number(row.querySelector('.lCost').value)||0;
+    const sell = Number(row.querySelector('.lPrice').value)||0;
+    row.classList.toggle('warn-line', sell>0 && sell<cost);
+  }
+
+  priceInp.addEventListener('input', ()=>{
+    if(Number(priceInp.value) !== Number(hiddenAuto.value)) hiddenAuto.value = '';
+    updateLineCost(wrap); checkMargin(wrap); calcTotal();
+  });
+  qtyInp.addEventListener('input', ()=>{ updateLineCost(wrap); calcTotal(); });
+  wrap.querySelector('.remove-line').onclick = () => { wrap.remove(); calcTotal(); };
+
+  if(prefill){
+    hiddenProd.value = prefill.pid;
+    hiddenAuto.value = prefill.price;
+    searchInp.value = prefill.name;
+    qtyInp.value = prefill.qty;
+    priceInp.value = prefill.price;
+  }
+
+  $('saleLines').append(wrap);
+  updateLineCost(wrap); checkMargin(wrap); calcTotal();
+}
+
+function updateLineCost(row){
+  const pid = row.querySelector('.lProd').value;
+  const qty = Number(row.querySelector('.lQty').value) || 0;
+  const p = pid ? pget(pid) : null;
+  if(!p){ row.querySelector('.lCost').value = 0; return; }
+  const {cost, shortage} = fifoCost(p, qty);
+  row.querySelector('.lCost').value = cost;
+  if(shortage > 0) row.classList.add('warn-line');
+}
+
+function calcTotal(){
+  let sub = 0, totalCost = 0;
+  document.querySelectorAll('.line-row').forEach(r => {
+    const qty = Number(r.querySelector('.lQty').value) || 0;
+    const price = Number(r.querySelector('.lPrice').value) || 0;
+    const cost = Number(r.querySelector('.lCost').value) || 0;
+    sub += qty * price;
+    totalCost += cost;
+  });
+  const discAmt = Number($('discountAmount').value) || 0;
+  const discPct = Number($('discountPercent').value) || 0;
+  const disc = Math.min(sub, discAmt + (sub * discPct / 100));
+  const total = Math.max(0, sub - disc);
+  const profit = sub - totalCost - disc;
+
+  $('subTotal').textContent = money(sub);
+  $('discountValue').textContent = money(disc);
+  $('invoiceTotal').textContent = money(total);
+  const pEl = $('invoiceProfit');
+  pEl.textContent = money(profit);
+  pEl.style.color = profit < 0 ? 'var(--danger)' : '';
+}
+
+$('addLine').onclick = () => addSaleLine();
+
+$('customer').addEventListener('input', ()=>{
+  const name = $('customer').value.trim();
+  const hint = $('customerHint');
+  if(!name){ hint.textContent = ''; return; }
+  const editId = $('saleEditId').value;
+  const open = findOpenSaleByCustomer(name, editId);
+  if(open){
+    hint.textContent = '⚠️ این مشتری یک فاکتور باز دارد. ابتدا آن را تسویه کنید.';
+    hint.style.color = 'var(--warn)';
+  }else{
+    hint.textContent = '✅ نام قابل استفاده است.';
+    hint.style.color = 'var(--ok)';
+  }
+});
+
+/* ============================================================
+   ویرایش فاکتور
+   ============================================================ */
+window.editSale = id => {
+  const s = sget(id); if(!s) return;
+  if(s.payStatus !== 'open'){ alert('فقط فاکتورهای باز قابل ویرایش هستند.'); return; }
+
+  $('saleEditId').value = s.id;
+  $('customer').value = s.customer;
+  $('discountAmount').value = s.discountAmount || 0;
+  $('discountPercent').value = s.discountPercent || 0;
+  $('payStatus').value = s.payStatus;
+  $('customerHint').textContent = '';
+
+  if(!$('invoiceDateWrap')._jpInstance){
+    $('invoiceDateWrap')._jpInstance = new JalaliDateInput('invoiceDateWrap', {value: s.date.slice(0,10)});
+  }else{
+    $('invoiceDateWrap')._jpInstance.setValue(s.date.slice(0,10));
+  }
+
+  $('saleLines').innerHTML = '';
+  s.items.forEach(it => addSaleLine(it));
+
+  $('sellTitle').textContent = 'ویرایش فاکتور فروش';
+  $('editBanner').classList.add('show');
+  $('editBannerText').textContent = 'ویرایش: ' + s.customer;
+  $('sellSubmitBtn').textContent = 'ذخیره تغییرات';
+  $('editCancelBtn').hidden = false;
+
+  document.querySelectorAll('.bnav-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  document.querySelector('.bnav-btn[data-tab="sell"]').classList.add('active');
+  $('sell').classList.add('active');
+  calcTotal();
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+
+function resetSaleForm(){
+  $('sForm').reset();
+  $('saleEditId').value = '';
+  $('discountAmount').value = 0;
+  $('discountPercent').value = 0;
+  $('payStatus').value = 'open';
+  $('customerHint').textContent = '';
+  $('saleLines').innerHTML = '';
+  if(!$('invoiceDateWrap')._jpInstance){
+    $('invoiceDateWrap')._jpInstance = new JalaliDateInput('invoiceDateWrap', {value: todayISO()});
+  }else{
+    $('invoiceDateWrap')._jpInstance.setValue(todayISO());
+  }
+  addSaleLine();
+  $('sellTitle').textContent = 'فاکتور فروش';
+  $('editBanner').classList.remove('show');
+  $('sellSubmitBtn').textContent = 'ثبت فاکتور و کسر موجودی';
+  $('editCancelBtn').hidden = true;
+  calcTotal();
+}
+$('editCancelBtn').onclick = () => { if(confirm('ویرایش لغو شود؟')) resetSaleForm(); };
+
+/* ============================================================
+   ثبت / ویرایش فاکتور
+   ============================================================ */
+$('sForm').onsubmit = e => {
+  e.preventDefault();
+  const editId = $('saleEditId').value;
+  const customer = $('customer').value.trim();
+  if(!customer){ alert('نام مشتری لازم است'); return; }
+  const open = findOpenSaleByCustomer(customer, editId);
+  if(open){ alert('مشتری «'+customer+'» فاکتور باز دارد. اول تسویه کنید.'); return; }
+
+  const rows = [...document.querySelectorAll('.line-row')];
+  if(!rows.length){ alert('حداقل یک محصول اضافه کنید'); return; }
+
+  const items = [];
+  for(const r of rows){
+    const pid = r.querySelector('.lProd').value;
+    const p = pget(pid);
+    const qty = Number(r.querySelector('.lQty').value);
+    const price = Number(r.querySelector('.lPrice').value);
+    if(!p || !Number.isInteger(qty) || qty < 1 || price < 0){
+      alert('اطلاعات ردیف را بررسی کنید'); return;
+    }
+    const {cost, breakdown, shortage} = fifoCost(p, qty);
+    if(shortage > 0){
+      alert('موجودی «'+p.name+'» کافی نیست. موجودی: '+fmt(totalQty(p))); return;
+    }
+    items.push({
+      pid: p.id, name: p.name, qty, price, buy: breakdown[0]?.buy || 0,
+      cost, breakdown, total: qty*price
+    });
+  }
+
+  const subTotal = items.reduce((a,i)=> a + i.total, 0);
+  const discAmt = Number($('discountAmount').value) || 0;
+  const discPct = Number($('discountPercent').value) || 0;
+  const discTotal = Math.min(subTotal, discAmt + (subTotal * discPct / 100));
+  const total = Math.max(0, subTotal - discTotal);
+  const payStatus = $('payStatus').value;
+  const invoiceIso = $('invoiceDateWrap')._jpInstance?.getValue() || todayISO();
+  const timePart = new Date().toISOString().slice(11);
+  const invoiceDate = invoiceIso + 'T' + timePart;
+
+  if(editId){
+    const old = sget(editId);
+    if(!old){ alert('فاکتور پیدا نشد'); return; }
+    if(old.payStatus !== 'open'){ alert('این فاکتور بسته است'); return; }
+
+    old.items.forEach(i => {
+      const p = pget(i.pid);
+      if(p && i.deductions) fifoRestore(p, i.deductions);
+    });
+
+    items.forEach(i => {
+      const p = pget(i.pid); if(!p) return;
+      const {cost, breakdown, shortage} = fifoCost(p, i.qty);
+      if(shortage > 0) return;
+      i.deductions = fifoDeduct(p, i.qty, old.id);
+      i.cost = cost;
+      i.buy = breakdown[0]?.buy || 0;
+    });
+
+    old.customer = customer;
+    old.items = items;
+    old.subTotal = subTotal;
+    old.discountAmount = discTotal;
+    old.discountPercent = discPct;
+    old.total = total;
+    old.payStatus = payStatus;
+    old.date = invoiceDate;
+
+    save(); toast("✅ فاکتور ویرایش شد");
+    resetSaleForm(); return;
+  }
+
+  const newSaleId = uid();
+  items.forEach(i => {
+    const p = pget(i.pid); if(!p) return;
+    i.deductions = fifoDeduct(p, i.qty, newSaleId);
+  });
+
+  db.sales.push({
+    id: newSaleId, customer, date: invoiceDate,
+    items, subTotal,
+    discountAmount: discTotal, discountPercent: discPct,
+    total, payStatus
+  });
+
+  save(); toast("✅ فاکتور ثبت شد");
+  resetSaleForm();
+};
+
+/* ============================================================
+   تغییر وضعیت / حذف
+   ============================================================ */
+window.togglePayStatus = id => {
+  const s = sget(id); if(!s) return;
+  s.payStatus = s.payStatus === 'open' ? 'closed' : 'open';
+  save(); toast(s.payStatus === 'open' ? "🔓 باز شد" : "✅ تسویه شد");
+};
+
+window.undoS = id => {
+  const s = sget(id); if(!s) return;
+  if(confirm('فاکتور حذف و موجودی به لات‌ها برگردانده شود؟')){
+    s.items.forEach(i => {
+      const p = pget(i.pid);
+      if(p && i.deductions) fifoRestore(p, i.deductions);
+    });
+    db.sales = db.sales.filter(x => x.id !== id);
+    if($('saleEditId').value === id) resetSaleForm();
+    save(); toast("↩️ حذف شد");
+  }
+};
+
+/* ============================================================
+   CSV
+   ============================================================ */
+function csvCell(v){ return '"' + String(v??'').replace(/"/g, '""') + '"'; }
+function makeCSV(){
+  const rows = [[
+    'نوع','شناسه کالا','نام کالا','شناسه لات','تاریخ لات','تعداد لات','قیمت خرید لات',
+    'قیمت خرید - تاریخ','قیمت خرید - مقدار','قیمت فروش - تاریخ','قیمت فروش - مقدار',
+    'مشتری','تاریخ فاکتور','شناسه فاکتور','تعداد فروخته','قیمت فروش واحد','بهای تمام‌شده (FIFO)',
+    'تخفیف مبلغ','تخفیف درصد','جمع نهایی','وضعیت تسویه'
+  ]];
+
+  db.products.forEach(p => {
+    const maxLen = Math.max(p.lots.length, p.buyPrices.length, p.sellPrices.length, 1);
+    for(let i = 0; i < maxLen; i++){
+      const lot = p.lots[i];
+      const bp = p.buyPrices[i];
+      const sp = p.sellPrices[i];
+      const isFirst = i === 0;
+      rows.push([
+        isFirst ? 'کالا' : 'ردیف کالا',
+        p.id,
+        isFirst ? p.name : '',
+        lot ? lot.id : '',
+        lot ? lot.date : '',
+        lot ? lot.qty : '',
+        lot ? lot.buy : '',
+        bp ? bp.from : '',
+        bp ? bp.price : '',
+        sp ? sp.from : '',
+        sp ? sp.price : '',
+        '', '', '', '', '', '', '', '', '', ''
+      ]);
+    }
+  });
+
+  db.sales.forEach(s => s.items.forEach((i, idx) => {
+    const first = idx === 0;
+    rows.push([
+      'قلم فروش', i.pid, i.name, '', '', '', '',
+      '', '', '', '',
+      s.customer, s.date, s.id, i.qty, i.price, i.cost || 0,
+      first ? (s.discountAmount || 0) : '',
+      first ? (s.discountPercent || 0) : '',
+      first ? (s.total || 0) : '',
+      first ? (s.payStatus || 'closed') : ''
+    ]);
+  }));
+
+  return '\ufeff' + rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+}
+
+$('exportBtn').onclick = () => {
+  const blob = new Blob([makeCSV()], {type: 'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'inventory_fifo_backup.csv'; a.click();
+  URL.revokeObjectURL(url);
+};
+
+function parseCSV(text){
+  text = text.replace(/^\ufeff/, '');
+  const rows = []; let row = [], cell = '', quoted = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(quoted){
+      if(c === '"' && text[i+1] === '"'){ cell += '"'; i++; }
+      else if(c === '"') quoted = false;
+      else cell += c;
+    }else{
+      if(c === '"') quoted = true;
+      else if(c === ','){ row.push(cell); cell = ''; }
+      else if(c === '\n'){ row.push(cell.replace(/\r$/, '')); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+  }
+  if(cell.length || row.length){ row.push(cell.replace(/\r$/, '')); rows.push(row); }
+  return rows;
+}
+
+$('importFile').onchange = async e => {
+  const file = e.target.files[0]; if(!file) return;
+  try{
+    const rows = parseCSV(await file.text());
+    if(rows[0]?.[0] !== 'نوع') throw Error('ساختار فایل ناشناخته است.');
+
+    const productsMap = new Map();
+    const salesMap = new Map();
+
+    for(const r of rows.slice(1)){
+      if(r[0] === 'کالا' || r[0] === 'ردیف کالا'){
+        const id = r[1];
+        if(!productsMap.has(id)){
+          productsMap.set(id, {id, name: '', buyPrices: [], sellPrices: [], lots: []});
+        }
+        const p = productsMap.get(id);
+        if(r[0] === 'کالا') p.name = r[2];
+        if(r[3]) p.lots.push({id: r[3], date: r[4] || '1970-01-01', qty: Number(r[5])||0, buy: Number(r[6])||0});
+        if(r[7]) p.buyPrices.push({from: r[7], price: Number(r[8])||0});
+        if(r[9]) p.sellPrices.push({from: r[9], price: Number(r[10])||0});
+      }else if(r[0] === 'قلم فروش'){
+        const sid = r[13];
+        if(!salesMap.has(sid)){
+          salesMap.set(sid, {
+            id: sid, customer: r[11], date: r[12], items: [], subTotal: 0,
+            discountAmount: Number(r[17])||0, discountPercent: Number(r[18])||0,
+            total: Number(r[19])||0, payStatus: r[20] || 'closed'
+          });
+        }
+        const s = salesMap.get(sid);
+        const qty = Number(r[14]) || 0, price = Number(r[15]) || 0;
+        const cost = Number(r[16]) || 0;
+        s.items.push({
+          pid: r[1], name: r[2], qty, price, cost,
+          buy: qty > 0 ? cost / qty : 0,
+          deductions: [], total: qty * price
+        });
+        s.subTotal += qty * price;
+      }
+    }
+
+    if(!productsMap.size && !salesMap.size) throw Error('فایل خالی است.');
+    if(!confirm('بازیابی، اطلاعات فعلی را جایگزین می‌کند. ادامه؟')) return;
+
+    db = {products: [...productsMap.values()], sales: [...salesMap.values()]};
+    db.products.forEach(p => {
+      if(!p.buyPrices.length) p.buyPrices = [{from: '1970-01-01', price: 0}];
+      if(!p.sellPrices.length) p.sellPrices = [{from: '1970-01-01', price: 0}];
+      if(!p.name) p.name = 'کالای بدون نام';
+    });
+    resetSaleForm(); save();
+    alert('اطلاعات بازیابی شد.');
+  }catch(err){
+    alert('خطا: ' + err.message);
+  }finally{
+    e.target.value = '';
+  }
+};
+
+/* ============================================================
+   رندر
+   ============================================================ */
+function renderAll(){
+  renderProducts(); renderHistory(); renderStats();
+}
+
+/* ============================================================
+   راه‌اندازی
+   ============================================================ */
+el("versionLabel").textContent = "نسخه " + APP_VERSION;
+el("aboutVersion").textContent = "نسخه " + APP_VERSION;
+
+// پیوند JalaliDateInput به input واقعی برای دسترسی آسان
+const _origInit = JalaliDateInput.prototype.render;
+JalaliDateInput.prototype.render = function(){
+  _origInit.call(this);
+  if(this.input) this.input._jpInstance = this;
+};
+
+load();
+renderAll();
+resetProductForm();
+resetSaleForm();
+
+setTimeout(()=>{
+  const s = el("pwaStatus");
+  const isHttps = location.protocol === "https:" || location.hostname === "localhost";
+  const hasSW = "serviceWorker" in navigator;
+  if(!isHttps){
+    s.textContent = "⚠️ با file:// باز شده — نصب کار نمی‌کند";
+    s.className = "pwa-status err";
+  }else if(!hasSW){
+    s.textContent = "⚠️ Service Worker پشتیبانی نمی‌شود";
+    s.className = "pwa-status warn";
+  }else if(window.matchMedia("(display-mode: standalone)").matches){
+    s.textContent = "✅ نصب‌شده اجرا می‌شود";
+    s.className = "pwa-status";
+  }else if(deferredPrompt){
+    s.textContent = "✅ آماده‌ی نصب";
+    s.className = "pwa-status";
+  }else{
+    s.textContent = "⏳ منتظر رویداد نصب...";
+    s.className = "pwa-status warn";
+  }
+}, 1500);
+</script>
+</body>
+</html>
