@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#0f766e">
 <title>مدیریت کالا، مشتری و فروش</title>
 
-  
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="مدیریت فروش">
@@ -15,13 +14,19 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='42' fill='%230f766e'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle'%3E%F0%9F%8F%AA%3C/text%3E%3C/svg%3E">
 
 <style>
+@import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
+
 :root{
   --bg:#f4f7f8;--card:#fff;--ink:#17212b;--muted:#667085;
   --brand:#0f766e;--brand-soft:#dff4ef;--brand-dark:#075e56;
   --line:#e4e9ed;--danger:#b42318;--warn:#92400e;--ok:#065f46;--profit:#166534;
   --accent:#e0f2fe;--accent-border:#7dd3fc;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow-md:0 4px 12px rgba(15,23,42,.08);
+  --shadow-lg:0 12px 32px rgba(15,23,42,.14);
+  --radius:14px;
 }
-[data-theme="blue"]{--bg:#f0f6fc;--brand:#1d4ed8;--brand-soft:#dbeafe;--brand-dark:#1e3a8a;--profit:#15803d;--accent:#e0f2fe}
+[data-theme="blue"]{--bg:#f0f6fc;--brand:#1d4ed8;--brand-soft:#dbeafe;--brand-dark:#1e3a8a;--profit:#15803d}
 [data-theme="purple"]{--bg:#f6f4fc;--brand:#7c3aed;--brand-soft:#ede9fe;--brand-dark:#5b21b6;--profit:#15803d}
 [data-theme="orange"]{--bg:#fdf6f0;--brand:#ea580c;--brand-soft:#ffedd5;--brand-dark:#9a3412;--profit:#15803d}
 [data-theme="pink"]{--bg:#fdf2f8;--brand:#db2777;--brand-soft:#fce7f3;--brand-dark:#9d174d;--profit:#15803d}
@@ -42,12 +47,19 @@
 [data-theme="dark"] .install-banner{background:var(--card);color:var(--ink)}
 [data-theme="dark"] .warn-line input.lPrice{background:#7c2d12;border-color:#ea580c}
 [data-theme="dark"] .stat.warn-card{background:#78350f;border-color:#b45309}
+[data-theme="dark"] .toast{background:#1e293b;color:#f1f5f9;border-color:#334155}
+[data-theme="dark"] .toast.success{background:#052e16;color:#bbf7d0;border-color:#166534}
+[data-theme="dark"] .toast.error{background:#450a0a;color:#fecaca;border-color:#7f1d1d}
+[data-theme="dark"] .toast.warn{background:#451a03;color:#fed7aa;border-color:#9a3412}
+[data-theme="dark"] .toast.info{background:#0c2a4a;color:#bae6fd;border-color:#075985}
 
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px Tahoma,Arial,sans-serif;
-  padding-bottom:calc(78px + env(safe-area-inset-bottom))}
-header{background:var(--brand);color:white;padding:17px 15px calc(17px + env(safe-area-inset-top));position:sticky;top:0;z-index:3}
-header h1{font-size:18px;margin:0 0 5px}
+html,body{font-family:'Vazirmatn',Tahoma,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 'Vazirmatn',Tahoma,Arial,sans-serif;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));
+  font-variant-numeric:tabular-nums}
+header{background:linear-gradient(135deg,var(--brand) 0%,var(--brand-dark) 100%);color:white;padding:17px 15px calc(17px + env(safe-area-inset-top));position:sticky;top:0;z-index:3;box-shadow:var(--shadow-md)}
+header h1{font-size:18px;margin:0 0 5px;font-weight:700}
 header p{margin:0;color:rgba(255,255,255,.85);font-size:12px}
 header .ver{color:rgba(255,255,255,.7);font-size:11px;margin-top:4px}
 main{max-width:720px;margin:auto;padding:12px}
@@ -56,57 +68,60 @@ main{max-width:720px;margin:auto;padding:12px}
   position:fixed;bottom:0;left:0;right:0;background:var(--card);
   border-top:1px solid var(--line);display:flex;z-index:100;
   padding-bottom:env(safe-area-inset-bottom);
-  box-shadow:0 -4px 12px rgba(0,0,0,.06);max-width:720px;margin:0 auto;
+  box-shadow:0 -4px 16px rgba(0,0,0,.08);max-width:720px;margin:0 auto;
 }
-.bnav-btn{flex:1;background:transparent;border:0;padding:10px 4px 8px;
+.bnav-btn{flex:1;background:transparent;border:0;padding:8px 2px 6px;
   display:flex;flex-direction:column;align-items:center;gap:2px;
-  color:var(--muted);cursor:pointer;font-family:inherit;font-size:11px;
-  transition:color .15s,background .15s;position:relative}
-.bnav-btn .icon{font-size:20px;line-height:1}
-.bnav-btn.active{color:var(--brand);font-weight:bold}
-.bnav-btn.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;
-  background:var(--brand);border-radius:0 0 3px 3px}
+  color:var(--muted);cursor:pointer;font-family:inherit;font-size:10px;
+  transition:color .2s,background .2s;position:relative;min-height:56px}
+.bnav-btn .icon{font-size:19px;line-height:1}
+.bnav-btn.active{color:var(--brand);font-weight:700}
+.bnav-btn.active::before{content:'';position:absolute;top:0;left:18%;right:18%;height:3px;
+  background:var(--brand);border-radius:0 0 4px 4px}
 .bnav-btn:active{background:var(--brand-soft)}
 
-
-/* ناوبری جمع‌وجور و منوی کناری */
 .header-row{display:flex;align-items:center;gap:10px}
 .header-row .head-copy{flex:1;min-width:0}
-.menu-icon-btn{width:40px;height:40px;flex:0 0 40px;border:1px solid rgba(255,255,255,.35);border-radius:11px;background:rgba(255,255,255,.12);color:#fff;font-size:22px;cursor:pointer}
-.drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:300;display:none}
+.menu-icon-btn{width:42px;height:42px;flex:0 0 42px;border:1px solid rgba(255,255,255,.35);border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-size:22px;cursor:pointer;transition:background .2s}
+.menu-icon-btn:hover{background:rgba(255,255,255,.24)}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:300;display:none;backdrop-filter:blur(2px)}
 .drawer-backdrop.open{display:block}
-.drawer{position:absolute;top:0;bottom:0;right:0;width:min(300px,85vw);background:var(--card);padding:18px 14px;box-shadow:-8px 0 28px rgba(0,0,0,.18);overflow:auto}
+.drawer{position:absolute;top:0;bottom:0;right:0;width:min(300px,85vw);background:var(--card);padding:18px 14px;box-shadow:-8px 0 28px rgba(0,0,0,.2);overflow:auto}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:8px 5px 16px;border-bottom:1px solid var(--line);margin-bottom:10px}
 .drawer-head strong{font-size:16px}
 .drawer-close{border:0;background:transparent;color:var(--muted);font-size:25px;cursor:pointer}
-.drawer-link{width:100%;display:flex;align-items:center;gap:12px;padding:13px 12px;margin:3px 0;border:0;border-radius:10px;background:transparent;color:var(--ink);font:inherit;text-align:right;cursor:pointer}
-.drawer-link.active,.drawer-link:active{background:var(--brand-soft);color:var(--brand);font-weight:bold}
+.drawer-link{width:100%;display:flex;align-items:center;gap:12px;padding:13px 12px;margin:3px 0;border:0;border-radius:10px;background:transparent;color:var(--ink);font:inherit;text-align:right;cursor:pointer;transition:background .15s}
+.drawer-link.active,.drawer-link:active{background:var(--brand-soft);color:var(--brand);font-weight:700}
 .drawer-link .dicon{width:25px;text-align:center;font-size:19px}
+
 .list-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .more-wrap{position:relative}
 .more-btn{width:36px;height:34px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font-size:21px;cursor:pointer}
-.more-menu{display:none;position:absolute;z-index:20;top:39px;left:0;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.more-menu{display:none;position:absolute;z-index:20;top:39px;left:0;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:6px;box-shadow:var(--shadow-lg)}
 .more-menu.show{display:block}
 .more-menu button{display:block;width:100%;text-align:right;border:0;background:transparent;color:var(--ink);padding:10px;border-radius:8px;font:inherit;cursor:pointer}
-.more-menu button:active{background:var(--brand-soft)}
-.bottom-nav{max-width:520px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0}
-.bnav-btn{padding:8px 4px 7px}
+.more-menu button:hover{background:var(--brand-soft)}
 @media(min-width:760px){.drawer{width:320px}}
 
-.panel{display:none}.panel.active{display:block}
-.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:11px}
-h2{font-size:15px;margin:0 0 12px}
-label{display:block;color:var(--muted);font-size:12px;margin:0 0 5px}
-input,select{width:100%;min-width:0;padding:11px;border:1px solid #cfd8df;border-radius:10px;background:var(--card);font:inherit;color:inherit}
-input:focus,select:focus{outline:2px solid var(--brand);outline-offset:1px}
+.panel{display:none}.panel.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+h2{font-size:15px;margin:0 0 12px;font-weight:700}
+label{display:block;color:var(--muted);font-size:12px;margin:0 0 5px;font-weight:500}
+input,select{width:100%;min-width:0;padding:11px;border:1px solid #cfd8df;border-radius:10px;background:var(--card);font:inherit;color:inherit;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
 form{display:grid;gap:10px}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .fields3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
-.primary{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px;font-weight:bold;font-family:inherit;cursor:pointer}
-.primary:active{opacity:.85}
-.secondary{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:inherit;cursor:pointer;color:inherit}
+.primary{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:12px;font-weight:700;font-family:inherit;cursor:pointer;transition:transform .1s,box-shadow .2s,background .2s;box-shadow:var(--shadow-sm)}
+.primary:hover{background:var(--brand-dark);box-shadow:var(--shadow-md)}
+.primary:active{transform:scale(.98)}
+.primary:disabled{opacity:.6;cursor:not-allowed}
+.secondary{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:inherit;cursor:pointer;color:inherit;transition:background .15s,border-color .15s}
+.secondary:hover{background:var(--brand-soft);border-color:var(--brand)}
 .small-btn{font-size:12px;padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--card);cursor:pointer;font-family:inherit;color:inherit}
 .danger{color:var(--danger);border-color:#efc2bf}
+.danger:hover{background:#fef2f2;border-color:var(--danger)}
 
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 8px;text-align:center}
@@ -117,23 +132,33 @@ form{display:grid;gap:10px}
 .stat.warn-card{background:#fef3c7;border-color:#fcd34d}
 .stat.warn-card strong{color:var(--warn)}
 
-.item{border-top:1px solid var(--line);padding:11px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.item{border-top:1px solid var(--line);padding:12px 0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;transition:background .15s}
 .item:first-child{border-top:0}
-.name{font-weight:bold;margin-bottom:4px}
-.sub{font-size:12px;color:var(--muted);line-height:1.7}
+.item:hover{background:rgba(15,118,110,.03)}
+.name{font-weight:700;margin-bottom:4px}
+.sub{font-size:12px;color:var(--muted);line-height:1.8}
 .actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.total{color:var(--brand);font-weight:bold}
-.profit{color:var(--profit);font-weight:bold}
-.empty{text-align:center;color:var(--muted);padding:16px}
+.total{color:var(--brand);font-weight:700}
+.profit{color:var(--profit);font-weight:700}
+
+.empty{text-align:center;color:var(--muted);padding:32px 16px}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 18px;text-align:center}
+.empty-state .es-icon{font-size:52px;margin-bottom:12px;opacity:.85}
+.empty-state .es-title{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.empty-state .es-desc{font-size:12px;color:var(--muted);line-height:1.8;max-width:280px;margin-bottom:16px}
+.empty-state .es-cta{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:11px 22px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:var(--shadow-md);transition:transform .1s}
+.empty-state .es-cta:active{transform:scale(.97)}
+
 .notice{font-size:11px;color:var(--muted);line-height:1.8}
 
 .line-row{display:grid;grid-template-columns:minmax(0,1fr) 74px 90px 32px;gap:5px;align-items:end;margin:8px 0}
 .line-row label{font-size:11px}
 .line-row input,.line-row select{padding:9px;font-size:12px}
-.remove-line{height:38px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--danger);cursor:pointer;font-size:16px;font-family:inherit}
+.remove-line{height:38px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--danger);cursor:pointer;font-size:16px;font-family:inherit;transition:background .15s}
+.remove-line:hover{background:#fef2f2}
 .line-search{position:relative}
 .line-search input{width:100%}
-.line-results{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid #cfd8df;border-radius:9px;margin-top:3px;max-height:220px;overflow-y:auto;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.15);display:none}
+.line-results{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid #cfd8df;border-radius:9px;margin-top:3px;max-height:220px;overflow-y:auto;z-index:50;box-shadow:var(--shadow-lg);display:none}
 .line-results.show{display:block}
 .line-result{padding:9px 11px;cursor:pointer;border-bottom:1px solid var(--line);font-size:12px}
 .line-result:last-child{border-bottom:0}
@@ -148,7 +173,15 @@ form{display:grid;gap:10px}
 .list-scroll::-webkit-scrollbar{width:6px}
 .list-scroll::-webkit-scrollbar-thumb{background:#cfd8df;border-radius:3px}
 
-.install-banner{position:fixed;bottom:80px;left:0;right:0;background:var(--card);padding:12px;box-shadow:0 -4px 15px rgba(0,0,0,.15);display:none;z-index:998;border-radius:14px 14px 0 0;max-width:720px;margin:0 auto}
+.sale-sticky{position:sticky;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));margin:12px -12px -12px;display:grid;gap:8px;box-shadow:0 -4px 16px rgba(0,0,0,.06);border-radius:0 0 16px 16px}
+.sale-sticky .summary-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.sale-sticky .summary-row strong{color:var(--ink);font-size:13px}
+.sale-sticky .summary-row.profit-row strong{color:var(--profit);font-size:14px}
+.sale-sticky .summary-row.total-row strong{color:var(--brand);font-size:16px;font-weight:800}
+.sale-sticky .primary{width:100%;padding:13px}
+.sale-sticky .secondary{width:100%}
+
+.install-banner{position:fixed;bottom:84px;left:0;right:0;background:var(--card);padding:12px;box-shadow:0 -4px 15px rgba(0,0,0,.15);display:none;z-index:998;border-radius:14px 14px 0 0;max-width:720px;margin:0 auto}
 .install-banner.show{display:block;animation:slideUp .3s ease}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .install-banner-content{display:flex;gap:10px;align-items:center}
@@ -163,10 +196,19 @@ form{display:grid;gap:10px}
 .pwa-status.warn{background:#fef3c7;color:#92400e}
 .pwa-status.err{background:#fee2e2;color:#991b1b}
 
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#17212b;color:white;padding:11px 18px;border-radius:9px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:999;max-width:90%}
-.toast.show{opacity:1}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:#17212b;color:white;padding:12px 18px;border-radius:12px;font-size:13px;
+  opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;z-index:999;
+  max-width:92%;box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;gap:9px;font-weight:500;border:1px solid transparent}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .toast-icon{font-size:18px;flex-shrink:0;line-height:1}
+.toast.success{background:#052e16;color:#bbf7d0;border-color:#166534}
+.toast.error{background:#450a0a;color:#fecaca;border-color:#7f1d1d}
+.toast.warn{background:#451a03;color:#fed7aa;border-color:#9a3412}
+.toast.info{background:#0c2a4a;color:#bae6fd;border-color:#075985}
 
-.badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:6px;font-weight:bold;margin-right:4px}
+.badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:6px;font-weight:700;margin-right:4px}
 .badge.open{background:#fef3c7;color:var(--warn)}
 .badge.closed{background:#d1fae5;color:var(--ok)}
 .badge.current{background:var(--accent);color:#075985;border:1px solid var(--accent-border)}
@@ -176,7 +218,7 @@ form{display:grid;gap:10px}
 
 .filter-bar{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}
 .filter-btn{flex:1;min-width:80px;border:1px solid var(--line);background:var(--card);border-radius:9px;padding:8px 5px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--ink)}
-.filter-btn.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-dark);font-weight:bold}
+.filter-btn.active{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-dark);font-weight:700}
 
 .discount-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .discount-hint{font-size:11px;color:var(--muted);margin-top:3px}
@@ -188,7 +230,7 @@ form{display:grid;gap:10px}
 .warn-line input.lPrice{background:#fff7ed;border-color:#fdba74}
 
 .price-section{background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:10px}
-.price-section h3{font-size:12px;margin:0 0 8px;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.price-section h3{font-size:12px;margin:0 0 8px;color:var(--ink);display:flex;justify-content:space-between;align-items:center;font-weight:700}
 .price-list{display:flex;flex-direction:column;gap:6px}
 .price-item{display:grid;grid-template-columns:1fr 110px 32px;gap:5px;align-items:center}
 .price-item input{padding:8px;font-size:12px}
@@ -197,96 +239,46 @@ form{display:grid;gap:10px}
 [data-theme="dark"] .price-item.current-row input{background:#052e16;border-color:#166534}
 .price-note{font-size:11px;color:var(--muted);margin-top:6px}
 
-.price-history-btn{background:none;border:0;color:var(--brand);cursor:pointer;font-size:11px;font-family:inherit;padding:0;text-decoration:underline}
+.price-history-btn{background:none;border:0;color:var(--brand);cursor:pointer;font-size:11px;font-family:inherit;padding:0;text-decoration:underline;font-weight:600}
 .price-history{display:none;background:var(--bg);border-radius:8px;padding:8px;margin-top:6px;font-size:11px}
 .price-history.show{display:block}
 .price-history-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--line)}
 .price-history-row:last-child{border-bottom:0}
 
 .theme-picker{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-.theme-swatch{border:2px solid var(--line);border-radius:10px;aspect-ratio:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .15s}
-.theme-swatch:hover{transform:scale(1.05)}
+.theme-swatch{border:2px solid var(--line);border-radius:10px;aspect-ratio:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform .15s,box-shadow .15s}
+.theme-swatch:hover{transform:scale(1.06);box-shadow:var(--shadow-md)}
 .theme-swatch.active{border-color:var(--brand);border-width:3px;box-shadow:0 0 0 2px var(--brand-soft)}
 
 .stat-block{margin-bottom:14px}
-.stat-block h3{font-size:13px;color:var(--brand);margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line)}
+.stat-block h3{font-size:13px;color:var(--brand);margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid var(--line);font-weight:700}
 .stat-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px dashed var(--line)}
 .stat-row:last-child{border-bottom:0}
 .stat-row .label{color:var(--muted)}
-.stat-row .value{font-weight:bold}
+.stat-row .value{font-weight:700}
 .stat-row.profit .value{color:var(--profit)}
 .stat-row.loss .value{color:var(--danger)}
 
-/* ============================================================
-   کامپوننت تاریخ شمسی
-   ============================================================ */
-.jp-date{
-  position:relative;
-  display:flex;gap:4px;
-  align-items:stretch;
-}
-.jp-date .jp-input{
-  flex:1;min-width:0;
-  padding:11px;border:1px solid #cfd8df;border-radius:10px;
-  background:var(--card);font:inherit;color:inherit;
-  text-align:center;font-variant-numeric:tabular-nums;
-  cursor:pointer;
-}
+.jp-date{position:relative;display:flex;gap:4px;align-items:stretch}
+.jp-date .jp-input{flex:1;min-width:0;padding:11px;border:1px solid #cfd8df;border-radius:10px;background:var(--card);font:inherit;color:inherit;text-align:center;font-variant-numeric:tabular-nums;cursor:pointer}
 .jp-date .jp-input:focus{outline:2px solid var(--brand);outline-offset:1px}
-.jp-date .jp-cal-btn{
-  padding:0 10px;border:1px solid #cfd8df;border-radius:10px;
-  background:var(--card);cursor:pointer;color:var(--brand);
-  font-size:16px;font-family:inherit;
-}
+.jp-date .jp-cal-btn{padding:0 10px;border:1px solid #cfd8df;border-radius:10px;background:var(--card);cursor:pointer;color:var(--brand);font-size:16px;font-family:inherit}
 .jp-date .jp-cal-btn:hover{background:var(--brand-soft)}
-
-.jp-picker{
-  position:absolute;top:100%;left:0;right:0;margin-top:4px;
-  background:var(--card);border:1px solid #cfd8df;border-radius:12px;
-  padding:10px;z-index:200;
-  box-shadow:0 8px 24px rgba(0,0,0,.18);
-  display:none;
-  min-width:260px;
-}
+.jp-picker{position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--card);border:1px solid #cfd8df;border-radius:12px;padding:10px;z-index:200;box-shadow:var(--shadow-lg);display:none;min-width:260px}
 .jp-picker.show{display:block}
-.jp-picker-head{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:8px;gap:4px;
-}
-.jp-picker-head button{
-  background:var(--bg);border:1px solid var(--line);border-radius:6px;
-  width:30px;height:30px;cursor:pointer;font-size:14px;font-family:inherit;
-  color:var(--ink);
-}
+.jp-picker-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:4px}
+.jp-picker-head button{background:var(--bg);border:1px solid var(--line);border-radius:6px;width:30px;height:30px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--ink)}
 .jp-picker-head button:hover{background:var(--brand-soft)}
-.jp-picker-title{
-  flex:1;text-align:center;font-weight:bold;font-size:13px;
-}
-.jp-picker-grid{
-  display:grid;grid-template-columns:repeat(7,1fr);gap:3px;
-}
-.jp-picker-dayname{
-  font-size:10px;text-align:center;color:var(--muted);
-  padding:4px 0;font-weight:bold;
-}
-.jp-picker-cell{
-  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-  border-radius:6px;cursor:pointer;font-size:12px;
-  background:transparent;border:0;font-family:inherit;color:var(--ink);
-  font-variant-numeric:tabular-nums;
-}
+.jp-picker-title{flex:1;text-align:center;font-weight:700;font-size:13px}
+.jp-picker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.jp-picker-dayname{font-size:10px;text-align:center;color:var(--muted);padding:4px 0;font-weight:700}
+.jp-picker-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:12px;background:transparent;border:0;font-family:inherit;color:var(--ink);font-variant-numeric:tabular-nums}
 .jp-picker-cell:hover{background:var(--brand-soft)}
 .jp-picker-cell.out{color:var(--muted);opacity:.4}
-.jp-picker-cell.today{background:#fef3c7;color:#92400e;font-weight:bold}
-.jp-picker-cell.selected{background:var(--brand);color:#fff;font-weight:bold}
-.jp-picker-foot{
-  display:flex;justify-content:space-between;margin-top:8px;gap:4px;
-}
-.jp-picker-foot button{
-  flex:1;padding:6px;border:1px solid var(--line);border-radius:6px;
-  background:var(--bg);cursor:pointer;font-family:inherit;font-size:11px;
-  color:var(--ink);
-}
+.jp-picker-cell.today{background:#fef3c7;color:#92400e;font-weight:700}
+.jp-picker-cell.selected{background:var(--brand);color:#fff;font-weight:700}
+.jp-picker-foot{display:flex;justify-content:space-between;margin-top:8px;gap:4px}
+.jp-picker-foot button{flex:1;padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);cursor:pointer;font-family:inherit;font-size:11px;color:var(--ink)}
 .jp-picker-foot button:hover{background:var(--brand-soft)}
 
 @media(max-width:380px){
@@ -295,33 +287,42 @@ form{display:grid;gap:10px}
   .line-row input,.line-row select{padding:8px 5px}
   .discount-row{grid-template-columns:1fr}
   .price-item{grid-template-columns:1fr 90px 28px}
-  .bnav-btn{font-size:10px}
-  .bnav-btn .icon{font-size:18px}
+  .bnav-btn{font-size:9px}
+  .bnav-btn .icon{font-size:17px}
   .theme-picker{grid-template-columns:repeat(4,1fr)}
 }
 .data-table th,.data-table td{padding:9px 7px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font-size:12px}
 .data-table th{background:var(--brand-soft);color:var(--ink);font-weight:700}
 .data-table tr:nth-child(even){background:var(--card)}
+.data-table tr:hover{background:var(--brand-soft)}
 
-/* فرم‌های جدید به صورت مودال / باتم‌شیت */
-.modal-shell{display:none;position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.52);align-items:flex-end;justify-content:center;padding:12px}
+.modal-shell{display:none;position:fixed;inset:0;z-index:500;background:rgba(15,23,42,.55);align-items:flex-end;justify-content:center;padding:12px;backdrop-filter:blur(3px)}
 .modal-shell.show{display:flex}
-.modal-dialog{width:min(720px,100%);max-height:92dvh;overflow:auto;background:var(--bg);border-radius:18px 18px 12px 12px;padding:12px;box-shadow:0 16px 48px rgba(0,0,0,.25)}
-.modal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 4px 10px}
-.modal-head strong{font-size:15px}
-.modal-close{border:0;background:var(--card);color:var(--ink);border-radius:9px;width:36px;height:36px;font-size:23px;cursor:pointer}
-.add-fab{width:42px;height:42px;border:0;border-radius:13px;background:var(--brand);color:white;font-size:28px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(15,118,110,.22)}
+.modal-dialog{width:min(720px,100%);max-height:92dvh;overflow:auto;background:var(--bg);border-radius:20px 20px 14px 14px;padding:12px;box-shadow:var(--shadow-lg)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 4px 10px;position:sticky;top:0;background:var(--bg);z-index:2}
+.modal-head strong{font-size:15px;font-weight:700}
+.modal-close{border:0;background:var(--card);color:var(--ink);border-radius:10px;width:38px;height:38px;font-size:23px;cursor:pointer;transition:background .15s}
+.modal-close:hover{background:var(--brand-soft)}
+.add-fab{width:44px;height:44px;border:0;border-radius:13px;background:var(--brand);color:white;font-size:28px;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(15,118,110,.3);transition:transform .1s}
+.add-fab:active{transform:scale(.94)}
 .page-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .page-toolbar h2{margin:0}
 .filter-select{max-width:190px}
 @media(min-width:600px){.modal-shell{align-items:center}.modal-dialog{border-radius:18px;max-height:88vh}}
 
+.csv-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+@media print{
+  header, .bottom-nav, .drawer-backdrop, .install-banner, .toast, .add-fab, .menu-icon-btn{display:none!important}
+  body{padding:0;background:#fff}
+  .card{box-shadow:none;border:1px solid #ccc}
+}
 </style>
 </head>
 <body>
 <header>
 <div class="header-row">
-  <div class="head-copy"><h1>🏪 مدیریت کالا، مشتری و فروش</h1><p>تاریخ شمسی · قیمت زمان‌دار · FIFO دقیق</p><p class="ver" id="versionLabel">نسخه ۲.۵</p></div>
+  <div class="head-copy"><h1>🏪 مدیریت کالا، مشتری و فروش</h1><p>تاریخ شمسی · قیمت زمان‌دار · FIFO دقیق</p><p class="ver" id="versionLabel">نسخه ۲.۷</p></div>
   <button class="menu-icon-btn" type="button" aria-label="باز کردن منو" onclick="toggleDrawer(true)">☰</button>
 </div>
 </header>
@@ -419,23 +420,21 @@ form{display:grid;gap:10px}
       <div><label>تخفیف (مبلغ)</label><input id="discountAmount" type="number" min="0" step="any" inputmode="decimal" value="0" oninput="calcTotal()"></div>
       <div><label>تخفیف (درصد)</label><input id="discountPercent" type="number" min="0" max="100" step="any" inputmode="decimal" value="0" oninput="calcTotal()"></div>
     </div>
-    <div class="sub">
-      جمع اقلام: <strong id="subTotal">۰</strong> ·
-      تخفیف: <strong id="discountValue">۰</strong> ·
-      قابل پرداخت: <strong class="total" id="invoiceTotal">۰</strong>
+    <div class="sale-sticky">
+      <div class="summary-row"><span>جمع اقلام</span><strong id="subTotal">۰</strong></div>
+      <div class="summary-row"><span>تخفیف</span><strong id="discountValue">۰</strong></div>
+      <div class="summary-row profit-row"><span>💰 سود دقیق (FIFO)</span><strong id="invoiceProfit">۰</strong></div>
+      <div class="summary-row total-row"><span>قابل پرداخت</span><strong id="invoiceTotal">۰</strong></div>
+      <div>
+        <label>وضعیت تسویه</label>
+        <select id="payStatus">
+          <option value="open">🔓 باز (تسویه نشده)</option>
+          <option value="closed">✅ بسته (تسویه شده)</option>
+        </select>
+      </div>
+      <button class="primary" id="sellSubmitBtn">ثبت فاکتور و کسر موجودی</button>
+      <button class="secondary" type="button" id="editCancelBtn" hidden>لغو ویرایش</button>
     </div>
-    <div class="sub" style="background:var(--brand-soft);padding:7px 10px;border-radius:8px;color:var(--profit)">
-      💰 سود دقیق (FIFO): <strong id="invoiceProfit">۰</strong>
-    </div>
-    <div>
-      <label>وضعیت تسویه</label>
-      <select id="payStatus">
-        <option value="open">🔓 باز (تسویه نشده)</option>
-        <option value="closed">✅ بسته (تسویه شده)</option>
-      </select>
-    </div>
-    <button class="primary" id="sellSubmitBtn">ثبت فاکتور و کسر موجودی</button>
-    <button class="secondary" type="button" id="editCancelBtn" hidden>لغو ویرایش</button>
   </form>
 </div>
 <p class="notice">هر مشتری فقط یک فاکتور باز می‌تواند داشته باشد. سود بر اساس لات‌های خرید (FIFO) محاسبه می‌شود.</p>
@@ -455,7 +454,7 @@ form{display:grid;gap:10px}
   <h2>📦 موجودی و کالاهای تحویل‌نشده</h2>
   <div class="stat-block">
     <h3>کالاهای تحویل‌نشده</h3>
-    <div id="undeliveredList"><div class="empty">همه کالاها تحویل شده‌اند.</div></div>
+    <div id="undeliveredList"><div class="empty-state"><div class="es-icon">📦</div><div class="es-title">همه کالاها تحویل شده‌اند</div><div class="es-desc">فاکتور تحویل‌نشده‌ای وجود ندارد.</div></div></div>
   </div>
 </div>
 </section>
@@ -508,12 +507,12 @@ form{display:grid;gap:10px}
 
 <div class="card">
   <h2>📊 پشتیبان اکسل (CSV)</h2>
-  <p class="notice">خروجی شامل کالاها، لات‌ها و فاکتورهاست. تاریخ‌ها در فایل به‌صورت میلادی هستند تا با اکسل سازگار باشند.</p>
+  <p class="notice">خروجی شامل کالاها، لات‌ها، فاکتورها، وضعیت تحویل و جزئیات FIFO (deductions) است. تاریخ‌ها در فایل به‌صورت میلادی هستند تا با اکسل سازگار باشند.</p>
   <button class="primary" id="exportBtn">دانلود خروجی CSV</button>
   <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
   <label>انتخاب فایل پشتیبان CSV</label>
   <input id="importFile" type="file" accept=".csv,text/csv">
-  <p class="notice">قبل از بازیابی، یک خروجی از اطلاعات فعلی بگیرید.</p>
+  <p class="notice">قبل از بازیابی، یک خروجی از اطلاعات فعلی بگیرید. سازگار با فایل‌های نسخه‌های قدیمی‌تر نیز هست.</p>
 </div>
 
 <div class="card">
@@ -527,7 +526,7 @@ form{display:grid;gap:10px}
   <div id="pwaStatus" class="pwa-status">در حال بررسی...</div>
   <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
   <h2>درباره</h2>
-  <p class="notice"><b>مدیریت کالا، مشتری و فروش</b> — <span id="aboutVersion">نسخه ۲.۵</span><br>اطلاعات در حافظه‌ی مرورگر همین دستگاه ذخیره می‌شود.</p>
+  <p class="notice"><b>مدیریت کالا، مشتری و فروش</b> — <span id="aboutVersion">نسخه ۲.۷</span><br>اطلاعات در حافظه‌ی مرورگر همین دستگاه ذخیره می‌شود.</p>
 </div>
 </section>
 
@@ -537,6 +536,8 @@ form{display:grid;gap:10px}
 <nav class="bottom-nav">
   <button class="bnav-btn active" data-tab="products"><span class="icon">📦</span><span>کالاها</span></button>
   <button class="bnav-btn" data-tab="history"><span class="icon">🧾</span><span>فاکتورها</span></button>
+  <button class="bnav-btn" data-tab="inventory"><span class="icon">📊</span><span>موجودی</span></button>
+  <button class="bnav-btn" data-tab="stats"><span class="icon">📈</span><span>آمار</span></button>
 </nav>
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="if(event.target===this)toggleDrawer(false)">
   <aside class="drawer" aria-label="منوی اصلی">
@@ -563,19 +564,18 @@ form{display:grid;gap:10px}
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast"><span class="toast-icon"></span><span class="toast-msg"></span></div>
 
 <script>
 /* ============================================================
    نسخه
    ============================================================ */
-const APP_VERSION = "۲.۵";
+const APP_VERSION = "۲.۷";
 
 /* ============================================================
-   ⭐ تاریخ شمسی — تبدیل‌گر
+   تاریخ شمسی — تبدیل‌گر
    ============================================================ */
 const JALALI = (() => {
-  // تبدیل میلادی ↔ شمسی
   function div(a, b){ return ~~(a / b); }
   function mod(a, b){ return a - ~~(a / b) * b; }
 
@@ -643,14 +643,8 @@ const JALALI = (() => {
   const MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
   const DAYS = ['ش','ی','د','س','چ','پ','ج'];
 
-  // API
   return {
-    // میلادی [gy,gm,gd] → شمسی [jy,jm,jd]
-    g2j,
-    // شمسی [jy,jm,jd] → میلادی [gy,gm,gd]
-    j2g,
-    isLeapJ, jMonthDays, MONTHS, DAYS,
-    // ISO 'YYYY-MM-DD' → 'YYYY/MM/DD' شمسی
+    g2j, j2g, isLeapJ, jMonthDays, MONTHS, DAYS,
     isoToJalali(iso){
       if(!iso) return '';
       const m = String(iso).slice(0,10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -658,7 +652,6 @@ const JALALI = (() => {
       const [jy, jm, jd] = g2j(+m[1], +m[2], +m[3]);
       return jy + '/' + String(jm).padStart(2,'0') + '/' + String(jd).padStart(2,'0');
     },
-    // 'YYYY/MM/DD' شمسی → ISO 'YYYY-MM-DD' میلادی
     jalaliToIso(jStr){
       if(!jStr) return '';
       const parts = String(jStr).replace(/[.\-]/g,'/').split('/').map(Number);
@@ -668,7 +661,6 @@ const JALALI = (() => {
       const [gy, gm, gd] = j2g(jy, jm, jd);
       return gy + '-' + String(gm).padStart(2,'0') + '-' + String(gd).padStart(2,'0');
     },
-    // نمایش کامل شمسی
     formatFull(iso){
       if(!iso) return '—';
       const m = String(iso).slice(0,10).match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -689,9 +681,9 @@ const JALALI = (() => {
 class JalaliDateInput {
   constructor(container, opts = {}){
     this.container = typeof container === 'string' ? document.getElementById(container) : container;
-    this.value = opts.value || ''; // ISO میلادی
+    this.value = opts.value || '';
     this.onChange = opts.onChange || null;
-    this.viewYear = 0; this.viewMonth = 0; // شمسی
+    this.viewYear = 0; this.viewMonth = 0;
     this.render();
   }
   setValue(iso){
@@ -730,7 +722,6 @@ class JalaliDateInput {
     this.grid = this.container.querySelector('.jp-picker-grid');
     this.syncInput();
 
-    // تعامل
     this.input.addEventListener('focus', ()=> this.openPicker());
     this.input.addEventListener('click', ()=> this.openPicker());
     this.input.addEventListener('blur', ()=> setTimeout(()=> this.parseTyped(), 100));
@@ -762,12 +753,10 @@ class JalaliDateInput {
       };
     });
 
-    // بستن با کلیک بیرون
     this.outsideHandler = (e)=>{
       if(!this.container.contains(e.target)) this.closePicker();
     };
 
-    // مقدار اولیه
     if(this.value){
       const m = this.value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
       if(m){
@@ -803,26 +792,21 @@ class JalaliDateInput {
     this.title.textContent = JALALI.MONTHS[this.viewMonth-1] + ' ' + this.viewYear;
 
     const days = JALALI.jMonthDays(this.viewYear, this.viewMonth);
-    // روز اول ماه شمسی در هفته (شنبه = 0)
     const [gy, gm, gd] = JALALI.j2g(this.viewYear, this.viewMonth, 1);
     const dt = new Date(gy, gm-1, gd);
-    const jsDay = dt.getDay(); // 0=Sun..6=Sat
-    // تبدیل به شنبه‌اول
-    let startCol = (jsDay + 1) % 7; // 0=Sat
+    const jsDay = dt.getDay();
+    let startCol = (jsDay + 1) % 7;
 
     const now = new Date();
     const todayISO = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
     const selIso = this.value;
 
     let html = '';
-    // نام روزها
     JALALI.DAYS.forEach(d => html += `<div class="jp-picker-dayname">${d}</div>`);
-    // روزهای ماه قبل
     const prevMonthDays = (this.viewMonth === 1) ? JALALI.jMonthDays(this.viewYear-1, 12) : JALALI.jMonthDays(this.viewYear, this.viewMonth-1);
     for(let i = 0; i < startCol; i++){
       html += `<button type="button" class="jp-picker-cell out" disabled>${prevMonthDays - startCol + i + 1}</button>`;
     }
-    // روزهای ماه
     for(let d = 1; d <= days; d++){
       const [ggy, ggm, ggd] = JALALI.j2g(this.viewYear, this.viewMonth, d);
       const iso = ggy + '-' + String(ggm).padStart(2,'0') + '-' + String(ggd).padStart(2,'0');
@@ -831,7 +815,6 @@ class JalaliDateInput {
       if(iso === selIso) cls.push('selected');
       html += `<button type="button" class="${cls.join(' ')}" data-iso="${iso}">${d}</button>`;
     }
-    // تکمیل 6 هفته
     const total = startCol + days;
     const remain = (7 - (total % 7)) % 7;
     for(let i = 1; i <= remain; i++){
@@ -849,11 +832,9 @@ class JalaliDateInput {
   parseTyped(){
     const raw = this.input.value.trim();
     if(!raw){ this.setValue(''); return; }
-    // پشتیبانی از ۱۴۰۴/۰۲/۱۲ و ۱۴۰۴-۲-۱۲ و 1404.2.12
     const norm = raw.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[.\-]/g, '/');
     const iso = JALALI.jalaliToIso(norm);
     if(iso){
-      // اعتبارسنجی
       const m = norm.split('/').map(Number);
       if(m.length === 3){
         const days = JALALI.jMonthDays(m[0] < 100 ? m[0]+1300 : m[0], m[1]);
@@ -917,7 +898,7 @@ window.addEventListener("beforeinstallprompt", (e)=>{
   if(!localStorage.getItem(INSTALL_DISMISS_KEY)) showInstallBanner();
 });
 window.addEventListener("appinstalled", ()=>{
-  toast("✅ نصب شد!"); dismissInstall(); deferredPrompt = null;
+  toast("نصب شد!", "success"); dismissInstall(); deferredPrompt = null;
   el("pwaStatus").textContent = "✅ نصب شده";
 });
 function showInstallBanner(){
@@ -941,7 +922,7 @@ async function tryInstall(){
   if(deferredPrompt){
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    toast(outcome === "accepted" ? "✅ نصب شد" : "نصب لغو شد");
+    toast(outcome === "accepted" ? "نصب شد" : "نصب لغو شد", outcome === "accepted" ? "success" : "info");
     deferredPrompt = null; dismissInstall();
   }else{
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -966,11 +947,20 @@ const money = fmt;
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function el(id){ return document.getElementById(id); }
-function toast(msg, ms){
-  const t = el("toast"); t.textContent = msg; t.classList.add("show");
+
+/* Toast رنگی با آیکون */
+function toast(msg, type, ms){
+  if(typeof type === 'number'){ ms = type; type = 'info'; }
+  type = type || 'info';
+  const t = el("toast");
+  if(!t) return;
+  const icons = { success:'✅', error:'❌', warn:'⚠️', info:'ℹ️' };
+  t.className = 'toast ' + type + ' show';
+  t.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span class="toast-msg">${esc(msg)}</span>`;
   clearTimeout(t._tid);
-  t._tid = setTimeout(()=>t.classList.remove("show"), ms||2200);
+  t._tid = setTimeout(()=>t.classList.remove("show"), ms || 2500);
 }
+
 function save(){ localStorage.setItem(KEY, JSON.stringify(db)); renderAll(); }
 const todayISO = () => {
   const d = new Date();
@@ -978,7 +968,7 @@ const todayISO = () => {
 };
 
 /* ============================================================
-   توابع قیمت زمان‌دار
+   قیمت زمان‌دار
    ============================================================ */
 function priceAt(prices, dateStr){
   if(!prices || !prices.length) return 0;
@@ -1026,7 +1016,6 @@ function fifoRestore(p, deductions){
     if(lot) lot.qty += d.qty;
   }
 }
-// بازگردانی موجودی حتی برای فاکتورهای قدیمی که deductions ندارند
 function restoreSaleItem(p, item){
   if(!p || !item) return;
   if(Array.isArray(item.deductions) && item.deductions.length){ fifoRestore(p, item.deductions); return; }
@@ -1035,7 +1024,6 @@ function restoreSaleItem(p, item){
     for(const d of breakdown){ const lot=p.lots.find(l=>l.id===d.lotId); if(lot) lot.qty += Number(d.qty)||0; }
     return;
   }
-  // فاکتورهای واردشده/قدیمی: فرض FIFO و بازگردانی به قدیمی‌ترین لات‌ها
   let remaining = Number(item.qty)||0;
   const lots=[...p.lots].sort((a,b)=>String(a.date).localeCompare(String(b.date)));
   for(const lot of lots){ if(remaining<=0) break; lot.qty += remaining; remaining=0; }
@@ -1127,7 +1115,8 @@ function applyTheme(name){
   });
   localStorage.setItem(THEME_KEY, name);
   const colors = {teal:'#0f766e', blue:'#1d4ed8', purple:'#7c3aed', orange:'#ea580c', pink:'#db2777', dark:'#0f172a'};
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', colors[name] || '#0f766e');
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', colors[name] || '#0f766e');
 }
 document.querySelectorAll('.theme-swatch').forEach(s => {
   s.onclick = () => applyTheme(s.dataset.theme);
@@ -1145,7 +1134,8 @@ function navigateTab(tab){
   document.querySelectorAll('.bnav-btn').forEach(x => x.classList.toggle('active', x.dataset.tab === tab));
   document.querySelectorAll('.drawer-link').forEach(x => x.classList.toggle('active', x.dataset.drawerTab === tab));
   document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-  $(tab).classList.add('active');
+  const target = $(tab);
+  if(target) target.classList.add('active');
   toggleDrawer(false);
   window.scrollTo({top:0});
   if(tab === 'stats') renderStats();
@@ -1165,7 +1155,7 @@ window.setFilter = function(f){
 };
 
 /* ============================================================
-   ردیف‌های قیمت (با JalaliDateInput)
+   ردیف‌های قیمت
    ============================================================ */
 function priceRowsHTML(prices){
   if(!prices.length) prices = [{from: todayISO(), price:0}];
@@ -1194,7 +1184,6 @@ function collectPrices(containerId){
     const slot = r.querySelector('.jp-slot');
     const dateInp = slot?.querySelector('.jp-input');
     let iso = '';
-    // از instance داخلی استفاده می‌کنیم
     if(dateInp && dateInp._jpInstance) iso = dateInp._jpInstance.getValue();
     else if(dateInp) iso = JALALI.jalaliToIso(dateInp.value);
     const price = Number(r.querySelector('.price-value').value) || 0;
@@ -1218,7 +1207,7 @@ window.addPriceRow = function(type, containerId){
 window.removePriceRow = function(btn){
   const list = btn.closest('.price-list');
   if(list.querySelectorAll('.price-item').length <= 1){
-    alert('حداقل یک بازه قیمتی لازم است');
+    toast('حداقل یک بازه قیمتی لازم است', 'warn');
     return;
   }
   btn.closest('.price-item').remove();
@@ -1232,6 +1221,7 @@ function updateMarginHint(){
   const buy = priceAt(buyPrices, today);
   const sell = priceAt(sellPrices, today);
   const hint = $('pMarginHint');
+  if(!hint) return;
   if(!buy || !sell){ hint.textContent = ''; return; }
   const margin = sell - buy;
   const pct = buy > 0 ? margin/buy*100 : 0;
@@ -1261,8 +1251,8 @@ $('pForm').onsubmit = e => {
   const sellPrices = collectPrices('pSellPrices').sort((a,b)=> a.from < b.from ? -1 : 1);
   const eid = $('pEdit').value;
 
-  if(!name){ alert('نام محصول لازم است'); return; }
-  if(!buyPrices.length || !sellPrices.length){ alert('حداقل یک قیمت خرید و یک قیمت فروش لازم است'); return; }
+  if(!name){ toast('نام محصول لازم است', 'warn'); return; }
+  if(!buyPrices.length || !sellPrices.length){ toast('حداقل یک قیمت خرید و یک قیمت فروش لازم است', 'warn'); return; }
 
   if(eid){
     const p = pget(eid); if(!p) return;
@@ -1271,7 +1261,7 @@ $('pForm').onsubmit = e => {
     db.products.push({id: uid(), name, buyPrices, sellPrices, lots: []});
   }
   resetProductForm(); closeProductModal(); save();
-  toast(eid ? "✅ ویرایش شد" : "✅ کالا اضافه شد");
+  toast(eid ? "با موفقیت ویرایش شد" : "کالا اضافه شد", "success");
 };
 
 function resetProductForm(){
@@ -1303,7 +1293,6 @@ window.editP = id => {
   $('buyQty').value = 1;
   $('buyPrice').value = priceAt(p.buyPrices, todayISO());
 
-  // تاریخ خرید (شمسی)
   if(!$('buyDateWrap')._jpInstance){
     $('buyDateWrap')._jpInstance = new JalaliDateInput('buyDateWrap', {value: todayISO()});
   }else{
@@ -1315,12 +1304,12 @@ window.editP = id => {
 
 window.delP = id => {
   if(db.sales.some(s => s.items.some(i => i.pid === id))){
-    alert('این کالا در فاکتور ثبت شده؛ ابتدا فاکتور را برگردانید.');
+    toast('این کالا در فاکتور ثبت شده؛ ابتدا فاکتور را برگردانید.', 'error');
     return;
   }
   if(confirm('کالا حذف شود؟')){
     db.products = db.products.filter(p=>p.id!==id);
-    save(); toast("🗑 حذف شد");
+    save(); toast("حذف شد", "success");
   }
 };
 
@@ -1331,11 +1320,11 @@ $('buyForm').onsubmit = e => {
   const qty = Number($('buyQty').value);
   const price = Number($('buyPrice').value);
   const iso = $('buyDateWrap')._jpInstance?.getValue() || todayISO();
-  if(!Number.isInteger(qty) || qty < 1){ alert('تعداد باید عدد صحیح مثبت باشد'); return; }
-  if(price < 0){ alert('قیمت نامعتبر'); return; }
+  if(!Number.isInteger(qty) || qty < 1){ toast('تعداد باید عدد صحیح مثبت باشد', 'warn'); return; }
+  if(price < 0){ toast('قیمت نامعتبر', 'error'); return; }
 
   p.lots.push({id: uid(), date: iso, qty, buy: price});
-  save(); toast("✅ لات خرید اضافه شد");
+  save(); toast("لات خرید اضافه شد", "success");
   $('buyQty').value = 1;
 };
 
@@ -1355,8 +1344,8 @@ function renderProducts(){
   });
   if(!list.length){
     $('productsList').innerHTML = q
-      ? '<div class="empty">کالایی با این نام پیدا نشد.</div>'
-      : '<div class="empty">کالایی ثبت نشده است.</div>';
+      ? `<div class="empty-state"><div class="es-icon">🔍</div><div class="es-title">نتیجه‌ای پیدا نشد</div><div class="es-desc">کالایی با این نام در سیستم نیست.</div></div>`
+      : `<div class="empty-state"><div class="es-icon">📦</div><div class="es-title">هنوز کالایی ثبت نکرده‌اید</div><div class="es-desc">اولین محصول خود را اضافه کنید تا مدیریت موجودی و فروش را شروع کنید.</div><button class="es-cta" onclick="openProductModal()">＋ ثبت اولین کالا</button></div>`;
     return;
   }
   $('productsList').innerHTML = list.map(p => {
@@ -1416,8 +1405,8 @@ function renderHistory(){
   }
   if(!list.length){
     $('historyList').innerHTML = q
-      ? '<div class="empty">فاکتوری با این جست‌وجو پیدا نشد.</div>'
-      : '<div class="empty">فاکتوری ثبت نشده است.</div>';
+      ? `<div class="empty-state"><div class="es-icon">🔍</div><div class="es-title">نتیجه‌ای پیدا نشد</div><div class="es-desc">فاکتوری با این جست‌وجو یافت نشد.</div></div>`
+      : `<div class="empty-state"><div class="es-icon">🧾</div><div class="es-title">هنوز فاکتوری ثبت نشده</div><div class="es-desc">اولین فاکتور فروش خود را صادر کنید.</div><button class="es-cta" onclick="openNewSaleModal()">＋ ثبت اولین فاکتور</button></div>`;
     return;
   }
   $('historyList').innerHTML = list.map(s => {
@@ -1639,7 +1628,7 @@ $('customer').addEventListener('input', ()=>{
    ============================================================ */
 window.editSale = id => {
   const s = sget(id); if(!s) return;
-  if(s.payStatus !== 'open'){ alert('فقط فاکتورهای باز قابل ویرایش هستند.'); return; }
+  if(s.payStatus !== 'open'){ toast('فقط فاکتورهای باز قابل ویرایش هستند.', 'warn'); return; }
 
   $('saleEditId').value = s.id;
   $('customer').value = s.customer;
@@ -1697,15 +1686,15 @@ $('sForm').onsubmit = e => {
   e.preventDefault();
   const editId = $('saleEditId').value;
   const customer = $('customer').value.trim();
-  if(!customer){ alert('نام مشتری لازم است'); return; }
+  if(!customer){ toast('نام مشتری لازم است', 'warn'); return; }
   const open = findOpenSaleByCustomer(customer, editId);
-  if(open){ alert('مشتری «'+customer+'» فاکتور باز دارد. اول تسویه کنید.'); return; }
+  if(open){ toast('مشتری «'+customer+'» فاکتور باز دارد. اول تسویه کنید.', 'warn'); return; }
 
   const rows = [...document.querySelectorAll('.line-row')];
-  if(!rows.length){ alert('حداقل یک محصول اضافه کنید'); return; }
+  if(!rows.length){ toast('حداقل یک محصول اضافه کنید', 'warn'); return; }
 
   const editingSale = editId ? sget(editId) : null;
-  if(editId && (!editingSale || editingSale.payStatus !== 'open')){ alert('این فاکتور قابل ویرایش نیست'); return; }
+  if(editId && (!editingSale || editingSale.payStatus !== 'open')){ toast('این فاکتور قابل ویرایش نیست', 'error'); return; }
   const items = [];
   const plannedQty = new Map();
   for(const r of rows){
@@ -1714,13 +1703,13 @@ $('sForm').onsubmit = e => {
     const qty = Number(r.querySelector('.lQty').value);
     const price = Number(r.querySelector('.lPrice').value);
     if(!p || !Number.isInteger(qty) || qty < 1 || price < 0){
-      alert('اطلاعات ردیف را بررسی کنید'); return;
+      toast('اطلاعات ردیف را بررسی کنید', 'error'); return;
     }
     const cumulativeQty = qty + (plannedQty.get(p.id)||0);
     const {cost, breakdown, shortage} = fifoCostWithRestoredSale(p, cumulativeQty, editingSale);
     if(shortage > 0){
       const available = totalQty(p) + (editingSale ? editingSale.items.filter(x=>x.pid===p.id).reduce((a,x)=>a+(Number(x.qty)||0),0) : 0);
-      alert('موجودی «'+p.name+'» کافی نیست. موجودی قابل استفاده در ویرایش: '+fmt(available)); return;
+      toast('موجودی «'+p.name+'» کافی نیست. موجودی قابل استفاده در ویرایش: '+fmt(available), 'error'); return;
     }
     plannedQty.set(p.id, cumulativeQty);
     items.push({
@@ -1741,8 +1730,8 @@ $('sForm').onsubmit = e => {
 
   if(editId){
     const old = sget(editId);
-    if(!old){ alert('فاکتور پیدا نشد'); return; }
-    if(old.payStatus !== 'open'){ alert('این فاکتور بسته است'); return; }
+    if(!old){ toast('فاکتور پیدا نشد', 'error'); return; }
+    if(old.payStatus !== 'open'){ toast('این فاکتور بسته است', 'error'); return; }
 
     old.items.forEach(i => { const p = pget(i.pid); restoreSaleItem(p, i); });
 
@@ -1764,7 +1753,7 @@ $('sForm').onsubmit = e => {
     old.payStatus = payStatus;
     old.date = invoiceDate;
 
-    save(); toast("✅ فاکتور ویرایش شد");
+    save(); toast("فاکتور ویرایش شد", "success");
     resetSaleForm(); closeSaleModal(); return;
   }
 
@@ -1781,7 +1770,7 @@ $('sForm').onsubmit = e => {
     total, payStatus
   });
 
-  save(); toast("✅ فاکتور ثبت شد");
+  save(); toast("فاکتور ثبت شد", "success");
   resetSaleForm(); closeSaleModal();
 };
 
@@ -1791,7 +1780,7 @@ $('sForm').onsubmit = e => {
 window.togglePayStatus = id => {
   const s = sget(id); if(!s) return;
   s.payStatus = s.payStatus === 'open' ? 'closed' : 'open';
-  save(); toast(s.payStatus === 'open' ? "🔓 باز شد" : "✅ تسویه شد");
+  save(); toast(s.payStatus === 'open' ? "فاکتور باز شد" : "تسویه شد", s.payStatus === 'open' ? 'info' : 'success');
 };
 
 window.undoS = id => {
@@ -1800,13 +1789,14 @@ window.undoS = id => {
     s.items.forEach(i => { const p = pget(i.pid); restoreSaleItem(p, i); });
     db.sales = db.sales.filter(x => x.id !== id);
     if($('saleEditId').value === id) resetSaleForm();
-    save(); toast("↩️ حذف شد");
+    save(); toast("فاکتور حذف شد", "success");
   }
 };
 
 window.toggleDelivered = id => {
   const s=sget(id); if(!s) return;
-  s.delivered=!s.delivered; save(); toast(s.delivered?'📦 تحویل ثبت شد':'↩️ وضعیت تحویل لغو شد');
+  s.delivered=!s.delivered; save();
+  toast(s.delivered?'تحویل ثبت شد':'وضعیت تحویل لغو شد', s.delivered?'success':'info');
 };
 function invoiceShareText(s){
   const lines=[`فاکتور مشتری: ${s.customer||'—'}`,`تاریخ: ${JALALI.formatFull(s.date)}`,'', 'اقلام:'];
@@ -1817,13 +1807,13 @@ function invoiceShareText(s){
 window.copyInvoiceText = async id => {
   const s=sget(id); if(!s) return;
   const txt=invoiceShareText(s);
-  try{ await navigator.clipboard.writeText(txt); toast('📋 متن فاکتور کپی شد'); }
-  catch(e){ const t=document.createElement('textarea'); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand('copy');toast('📋 متن فاکتور کپی شد');}catch(_){alert(txt);} t.remove(); }
+  try{ await navigator.clipboard.writeText(txt); toast('متن فاکتور کپی شد', 'success'); }
+  catch(e){ const t=document.createElement('textarea'); t.value=txt; document.body.appendChild(t); t.select(); try{document.execCommand('copy');toast('متن فاکتور کپی شد','success');}catch(_){alert(txt);} t.remove(); }
 };
 function renderInventory(){
   const undelivered=db.sales.filter(s=>!s.delivered);
   const host=$('undeliveredList');
-  if(!undelivered.length) host.innerHTML='<div class="empty">همه فاکتورها تحویل شده‌اند.</div>';
+  if(!undelivered.length) host.innerHTML=`<div class="empty-state"><div class="es-icon">📦</div><div class="es-title">همه کالاها تحویل شده‌اند</div><div class="es-desc">فاکتور تحویل‌نشده‌ای وجود ندارد.</div></div>`;
   else host.innerHTML=undelivered.map(s=>`<div class="item"><div style="flex:1;min-width:0"><div class="name">${esc(s.customer||'بدون نام')} <span class="badge open">تحویل‌نشده</span></div><div class="sub">${JALALI.formatFull(s.date)} · ${s.items.map(i=>`${esc(i.name)} × ${fmt(i.qty)}`).join('، ')}</div><div class="total">${money(s.total)}</div></div><div class="actions"><button class="secondary" onclick="toggleDelivered('${s.id}')">📦 ثبت تحویل</button></div></div>`).join('');
   const rows=db.products.map(p=>({p,qty:totalQty(p),lots:p.lots.filter(l=>l.qty>0).length,buy:priceAt(p.buyPrices,todayISO()),sell:priceAt(p.sellPrices,todayISO()),undeliveredQty:db.sales.filter(s=>!s.delivered).reduce((n,s)=>n+s.items.filter(i=>i.pid===p.id).reduce((a,i)=>a+Number(i.qty||0),0),0),value:stockValue(p)}));
   $('inventoryTable').innerHTML=rows.length?rows.map(x=>`<tr><td>${esc(x.p.name)}</td><td>${fmt(x.qty)}</td><td>${fmt(x.lots)}</td><td>${money(x.buy)}</td><td>${money(x.sell)}</td><td>${fmt(x.undeliveredQty)}</td><td>${money(x.value)}</td></tr>`).join(''):'<tr><td colspan="7">کالایی ثبت نشده است.</td></tr>';
@@ -1833,7 +1823,7 @@ function renderInventory(){
 }
 
 /* ============================================================
-   CSV
+   CSV (نسخه ۲.۷ — با ستون‌های تحویل و deductions)
    ============================================================ */
 function csvCell(v){ return '"' + String(v??'').replace(/"/g, '""') + '"'; }
 function makeCSV(){
@@ -1841,7 +1831,7 @@ function makeCSV(){
     'نوع','شناسه کالا','نام کالا','شناسه لات','تاریخ لات','تعداد لات','قیمت خرید لات',
     'قیمت خرید - تاریخ','قیمت خرید - مقدار','قیمت فروش - تاریخ','قیمت فروش - مقدار',
     'مشتری','تاریخ فاکتور','شناسه فاکتور','تعداد فروخته','قیمت فروش واحد','بهای تمام‌شده (FIFO)',
-    'تخفیف مبلغ','تخفیف درصد','جمع نهایی','وضعیت تسویه'
+    'تخفیف مبلغ','تخفیف درصد','جمع نهایی','وضعیت تسویه','وضعیت تحویل','جزئیات FIFO (deductions)','جزئیات FIFO (breakdown)'
   ]];
 
   db.products.forEach(p => {
@@ -1863,13 +1853,15 @@ function makeCSV(){
         bp ? bp.price : '',
         sp ? sp.from : '',
         sp ? sp.price : '',
-        '', '', '', '', '', '', '', '', '', ''
+        '', '', '', '', '', '', '', '', '', '', '', '', ''
       ]);
     }
   });
 
   db.sales.forEach(s => s.items.forEach((i, idx) => {
     const first = idx === 0;
+    const deductionsJson = Array.isArray(i.deductions) ? JSON.stringify(i.deductions) : '';
+    const breakdownJson = Array.isArray(i.breakdown) ? JSON.stringify(i.breakdown) : '';
     rows.push([
       'قلم فروش', i.pid, i.name, '', '', '', '',
       '', '', '', '',
@@ -1877,7 +1869,10 @@ function makeCSV(){
       first ? (s.discountAmount || 0) : '',
       first ? (s.discountPercent || 0) : '',
       first ? (s.total || 0) : '',
-      first ? (s.payStatus || 'closed') : ''
+      first ? (s.payStatus || 'closed') : '',
+      first ? (s.delivered ? '1' : '0') : '',
+      deductionsJson,
+      breakdownJson
     ]);
   }));
 
@@ -1890,6 +1885,7 @@ $('exportBtn').onclick = () => {
   const a = document.createElement('a');
   a.href = url; a.download = 'inventory_fifo_backup.csv'; a.click();
   URL.revokeObjectURL(url);
+  toast('خروجی CSV دانلود شد', 'success');
 };
 
 function parseCSV(text){
@@ -1912,18 +1908,36 @@ function parseCSV(text){
   return rows;
 }
 
+function safeParseArray(jsonStr){
+  if(!jsonStr) return [];
+  try{
+    const v = JSON.parse(jsonStr);
+    return Array.isArray(v) ? v : [];
+  }catch(e){ return []; }
+}
+
 $('importFile').onchange = async e => {
   const file = e.target.files[0]; if(!file) return;
   try{
     const rows = parseCSV(await file.text());
-    if(rows[0]?.[0] !== 'نوع') throw Error('ساختار فایل ناشناخته است.');
+    if(!rows.length || rows[0]?.[0] !== 'نوع') throw Error('ساختار فایل ناشناخته است.');
+
+    const header = rows[0];
+    const hasDeliveredCol = header.includes('وضعیت تحویل');
+    const hasDeductionsCol = header.includes('جزئیات FIFO (deductions)');
+    const hasBreakdownCol = header.includes('جزئیات FIFO (breakdown)');
+    const idxDelivered = hasDeliveredCol ? header.indexOf('وضعیت تحویل') : -1;
+    const idxDeductions = hasDeductionsCol ? header.indexOf('جزئیات FIFO (deductions)') : -1;
+    const idxBreakdown = hasBreakdownCol ? header.indexOf('جزئیات FIFO (breakdown)') : -1;
 
     const productsMap = new Map();
     const salesMap = new Map();
 
     for(const r of rows.slice(1)){
+      if(!r || !r.length) continue;
       if(r[0] === 'کالا' || r[0] === 'ردیف کالا'){
         const id = r[1];
+        if(!id) continue;
         if(!productsMap.has(id)){
           productsMap.set(id, {id, name: '', buyPrices: [], sellPrices: [], lots: []});
         }
@@ -1934,20 +1948,32 @@ $('importFile').onchange = async e => {
         if(r[9]) p.sellPrices.push({from: r[9], price: Number(r[10])||0});
       }else if(r[0] === 'قلم فروش'){
         const sid = r[13];
+        if(!sid) continue;
         if(!salesMap.has(sid)){
           salesMap.set(sid, {
             id: sid, customer: r[11], date: r[12], items: [], subTotal: 0,
             discountAmount: Number(r[17])||0, discountPercent: Number(r[18])||0,
-            total: Number(r[19])||0, payStatus: r[20] || 'closed'
+            total: Number(r[19])||0, payStatus: r[20] || 'closed',
+            delivered: false
           });
         }
         const s = salesMap.get(sid);
         const qty = Number(r[14]) || 0, price = Number(r[15]) || 0;
         const cost = Number(r[16]) || 0;
+
+        if(idxDelivered >= 0 && r[idxDelivered] !== '' && r[idxDelivered] != null){
+          const val = String(r[idxDelivered]).trim();
+          if(val === '1' || val === 'true' || val === 'TRUE') s.delivered = true;
+          else if(val === '0' || val === 'false' || val === 'FALSE') s.delivered = false;
+        }
+
+        const deductions = idxDeductions >= 0 ? safeParseArray(r[idxDeductions]) : [];
+        const breakdown = idxBreakdown >= 0 ? safeParseArray(r[idxBreakdown]) : [];
+
         s.items.push({
           pid: r[1], name: r[2], qty, price, cost,
           buy: qty > 0 ? cost / qty : 0,
-          deductions: [], total: qty * price
+          deductions, breakdown, total: qty * price
         });
         s.subTotal += qty * price;
       }
@@ -1957,15 +1983,29 @@ $('importFile').onchange = async e => {
     if(!confirm('بازیابی، اطلاعات فعلی را جایگزین می‌کند. ادامه؟')) return;
 
     db = {products: [...productsMap.values()], sales: [...salesMap.values()]};
+
     db.products.forEach(p => {
       if(!p.buyPrices.length) p.buyPrices = [{from: '1970-01-01', price: 0}];
       if(!p.sellPrices.length) p.sellPrices = [{from: '1970-01-01', price: 0}];
       if(!p.name) p.name = 'کالای بدون نام';
+      p.lots.forEach(l => { if(l.qty < 0) l.qty = 0; });
     });
-    resetSaleForm(); save();
-    alert('اطلاعات بازیابی شد.');
+
+    db.sales.forEach(s => {
+      s.items.forEach(i => {
+        if((!i.deductions || !i.deductions.length) && Array.isArray(i.breakdown) && i.breakdown.length){
+          i.deductions = i.breakdown.map(b => ({
+            lotId: b.lotId, qty: b.qty, buy: b.buy, date: b.date, saleId: s.id
+          }));
+        }
+      });
+    });
+
+    resetSaleForm();
+    save();
+    toast('اطلاعات بازیابی شد. کالاها: ' + db.products.length + ' · فاکتورها: ' + db.sales.length, 'success', 4000);
   }catch(err){
-    alert('خطا: ' + err.message);
+    toast('خطا: ' + err.message, 'error', 4000);
   }finally{
     e.target.value = '';
   }
@@ -1984,7 +2024,6 @@ function renderAll(){
 el("versionLabel").textContent = "نسخه " + APP_VERSION;
 el("aboutVersion").textContent = "نسخه " + APP_VERSION;
 
-// پیوند JalaliDateInput به input واقعی برای دسترسی آسان
 const _origInit = JalaliDateInput.prototype.render;
 JalaliDateInput.prototype.render = function(){
   _origInit.call(this);
@@ -1998,6 +2037,7 @@ resetSaleForm();
 
 setTimeout(()=>{
   const s = el("pwaStatus");
+  if(!s) return;
   const isHttps = location.protocol === "https:" || location.hostname === "localhost";
   const hasSW = "serviceWorker" in navigator;
   if(!isHttps){
@@ -2019,4 +2059,4 @@ setTimeout(()=>{
 }, 1500);
 </script>
 </body>
-</html>
+  </html>
